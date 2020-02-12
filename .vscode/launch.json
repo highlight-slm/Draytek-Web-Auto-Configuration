@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -44,13 +45,24 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: Example - upgrade",
+            "name": "Python: Example - upgrade (not headless)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/examples/upgrade.py",
             "args": [
                 "${workspaceFolder}/examples/upgrade.csv",
                 "--not-headless"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Example - upgrade (headless)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/upgrade.py",
+            "args": [
+                "${workspaceFolder}/examples/upgrade.csv",
+                "--debug"
             ],
             "console": "integratedTerminal"
         },
