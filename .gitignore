@@ -105,4 +105,4 @@ venv.bak/
 
 # WebDriver Browsers
 geckodriver.exe
-chromedriver.exe
+chromedriver.exedraytek_test.py
