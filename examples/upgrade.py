@@ -23,7 +23,7 @@ def _get_parser():
 
     """
     parser = argparse.ArgumentParser(
-        description="Upgrade Dayrtek Router firmware from a source CSV file"
+        description="Upgrade Draytek Router firmware from a source CSV file"
     )
     parser.add_argument(
         "inputfile",
@@ -116,7 +116,7 @@ def upgrade_router(router, headless=True, upgrade=False):
         if upgrade_required:
             if upgrade:
                 LOGGER.info(f"Router {webadmin_session.hostname} - Upgrading Router")
-                # webadmin_session.upgrade(preview)  # Might as well reuse the Preview (Firmware) object
+                webadmin_session.upgrade(preview)  # Reuse the Preview (Firmware) object
             else:
                 LOGGER.info(
                     f"Router {webadmin_session.hostname} - Upgrade required. Not appllied. Re-run with --upgrade argument"

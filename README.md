@@ -65,9 +65,13 @@ Write new settings to router: `examples/write_settings.py`
 
 ### Upgrade Router Firmware
 
-Apply firmware updates to multiple routers specified in a CSV file
+Apply firmware updates to multiple routers specified in a CSV file. File can contain multiple routers, models, versions.
 
-Usage: TODO
+Usage:
+ - Generate input file template: `upgrade.py -t upgrade-template.csv`
+ - Preview upgrade: `upgrade.py upgrade.csv`
+ - Apply firmware updates: `upgrade.py -u upgrade.csv`
+   - Example [upgrade.csv](https://raw.githubusercontent.com/highlight-slm/Draytek-Web-Auto-Configuration/master/examples/upgrade.csv)
 
 See: `examples/upgrade.py`
 
