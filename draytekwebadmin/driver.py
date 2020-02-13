@@ -3,6 +3,7 @@
 import logging
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 LOGGER = logging.getLogger("root")
 
@@ -71,7 +72,11 @@ def load_firefox(headless):
     LOGGER.info("Loading Webdriver - Firefox")
     options = webdriver.FirefoxOptions()
     options.headless = headless
-    driver = webdriver.Firefox(firefox_options=options)
+    desired_capabilities = DesiredCapabilities.FIREFOX.copy()
+    desired_capabilities["acceptInsecureCerts"] = True
+    driver = webdriver.Firefox(
+        firefox_options=options, capabilities=desired_capabilities
+    )
     driver.maximize_window()
     return driver
 
@@ -90,7 +95,11 @@ def load_chrome(headless):
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
     options.headless = headless
-    return webdriver.Chrome(chrome_options=options)
+    desired_capabilities = DesiredCapabilities.CHROME.copy()
+    desired_capabilities["acceptInsecureCerts"] = True
+    return webdriver.Chrome(
+        chrome_options=options, desired_capabilities=desired_capabilities
+    )
 
 
 def load_edge():
