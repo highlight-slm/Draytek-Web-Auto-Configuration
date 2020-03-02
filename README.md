@@ -1,6 +1,6 @@
 # DrayTek-Web-Auto-Configuration
 
-[![Build Status](https://travis-ci.org/highlight-slm/Draytek-Web-Auto-Configuration.svg?branch=master)](https://travis-ci.org/highlight-slm/Draytek-Web-Auto-Configuration/) [![Coverage Status](https://coveralls.io/repos/github/highlight-slm/Draytek-Web-Auto-Configuration/badge.svg?branch=master)](https://coveralls.io/github/highlight-slm/Draytek-Web-Auto-Configuration?branch=master)
+[![Build Status](https://travis-ci.org/highlight-slm/Draytek-Web-Auto-Configuration.svg?branch=master)](https://travis-ci.org/highlight-slm/Draytek-Web-Auto-Configuration/)
 
 Some customers may have rolled out large number of DrayTek routers with only Web Management enabled. This makes rolling out changes to a large number of devices a tedious, manual, slow and error prone activity. Whilst DrayTek routers support TR069 to provide centralised management via an ACS, often this isn't used.
 
