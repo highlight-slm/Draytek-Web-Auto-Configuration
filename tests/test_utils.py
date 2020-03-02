@@ -63,17 +63,17 @@ class TestUtils(unittest.TestCase):
     def test_validIPv4Subnet(self):
         self.assertTrue(valid_ipv4_subnet(None))
         self.assertTrue(valid_ipv4_subnet(""))
-        self.assertTrue(valid_ipv4_subnet(22))
-        self.assertTrue(valid_ipv4_subnet(23))
-        self.assertTrue(valid_ipv4_subnet(24))
-        self.assertTrue(valid_ipv4_subnet(32))
-        self.assertTrue(valid_ipv4_subnet("32"))
+        self.assertTrue(valid_ipv4_subnet("255.255.252.0 / 22"))
+        self.assertTrue(valid_ipv4_subnet("255.255.254.0 / 23"))
+        self.assertTrue(valid_ipv4_subnet("255.255.255.0 / 24"))
+        self.assertTrue(valid_ipv4_subnet("255.255.255.0 / 32"))
 
-        self.assertFalse(valid_ipv4_subnet(21))
-        self.assertFalse(valid_ipv4_subnet(33))
+        self.assertFalse(valid_ipv4_subnet("255.255.128.0 / 17"))
+        self.assertFalse(valid_ipv4_subnet("255.255.255.0 / 33"))
+        self.assertFalse(valid_ipv4_subnet("255.255.256.0 / 32"))
 
         with self.assertRaises(ValueError):
-            valid_ipv4_subnet("NotANumber")
+            valid_ipv4_subnet("NotASubnet")
 
     def test_validIPv6PreFixLength(self):
         self.assertTrue(valid_ipv6_prefix(None))

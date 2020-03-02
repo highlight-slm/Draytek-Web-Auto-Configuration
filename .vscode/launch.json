@@ -6,6 +6,7 @@
     "configurations": [
 
 
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -28,7 +29,8 @@
             "args": [
                 "--address", "https://192.168.100.221",
                 "--user", "admin",
-                "--password", "Welcome9396"
+                "--password", "Welcome9396",
+                "--debug"
             ],
             "console": "integratedTerminal"
         },
@@ -39,24 +41,26 @@
             "program": "${workspaceFolder}/examples/write_settings.py",
             "args": [
                 "${workspaceFolder}/draytek-out.csv",
-                "--not-headless",
-                "--no-reboot"
+                "--no-reboot",
+                "--debug"
             ],
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: Example - upgrade (not headless)",
+            "name": "Python: Example - upgrade preview with config file",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/examples/upgrade.py",
             "args": [
                 "${workspaceFolder}/examples/upgrade.csv",
-                "--not-headless"
+                "--config",
+                "C:\\Users\\MartinRowan\\source\\repos\\Draytek-Web-Auto-Configuration\\examples\\conf"
+
             ],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
         },
         {
-            "name": "Python: Example - upgrade (headless)",
+            "name": "Python: Example - upgrade (debug)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/examples/upgrade.py",

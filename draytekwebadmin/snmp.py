@@ -23,13 +23,10 @@ class SNMP:
     """SNMP Base Class."""
 
     def __init__(self, enable_agent=None, enable_v3_agent=None):
-        """
-        SNMP base class.
+        """SNMP base class.
 
-        Args:
-            enable_agent (bool): Enable or Disable SNMP v1/v2 agent
-            enable_v3_agent (bool): Enable or Disable SNMP v3 agent
-
+        :param enable_agent: (bool)Enable or Disable SNMP v1/v2 agent
+        :param enable_v3_agent: (bool) Enable or Disable SNMP v3 agent
         """
         self.enable_agent = enable_agent
         self.enable_v3_agent = enable_v3_agent
@@ -52,17 +49,14 @@ class SNMPv3(SNMP):
         priv_algorithm=None,
         priv_password=None,
     ):
-        """
-        SNMPv3 - derived from SNMP base class.
+        """SNMPv3 - derived from SNMP base class.
 
-        Args:
-            enable_agent (bool):  Enable or Disable SNMPv3 agent. Note SNMPv1v2 Agent must be enabled first.
-            sum_user (str): SNMPv3 User Name
-            auth_algorithm (str): Authentication Algorithm: No Auth, MD5 or SHA
-            auth_password (str):  Authentication Password
-            priv_algorithm (str): Privacy Algorithm: No Priv, DES or AES
-            priv_password (str): Privacy Password
-
+        :param enable_agent: (bool) Enable or Disable SNMPv3 agent. Note SNMPv1v2 Agent must be enabled first.
+        :param usm_user: (str)SNMPv3 User Name
+        :param auth_algorithm: (str) Authentication Algorithm: No Auth, MD5 or SHA
+        :param auth_password: (str) Authentication Password
+        :param priv_algorithm: (str) Privacy Algorithm: No Priv, DES or AES
+        :param priv_password: (str) Privacy Password
         """
         super().__init__(enable_agent=True, enable_v3_agent=True)
         self.enable_v3_agent = enable_v3_agent
@@ -88,14 +82,11 @@ class SNMPv1v2(SNMP):
     """SNMPv1v2 Base Class."""
 
     def __init__(self, enable_agent=None, get_community=None, set_community=None):
-        """
-        SNMPv1v2 class - derived from SNMP base class.
+        """SNMPv1v2 class - derived from SNMP base class.
 
-        Args:
-            enable_agent (bool): Enable or Disable SNMP agent
-            get_community (str): Public or read only SNMP community string
-            set_community (str): Private or read/write SNMP community string
-
+        :param enable_agent: (bool) Enable or Disable SNMP agent
+        :param get_community: (str) Public or read only SNMP community string
+        :param set_community: (str) Private or read/write SNMP community string
         """
         super().__init__(enable_agent=True)
         self.enable_agent = enable_agent
@@ -126,20 +117,17 @@ class SNMPIPv4(SNMPv1v2):
         manager_host_subnet_2=None,
         manager_host_subnet_3=None,
     ):
-        """
-        SNMPIPv4 - derived from SNMPv1v2 base class.
+        """SNMPIPv4 - derived from SNMPv1v2 base class.
 
-        Args:
-            enable_agent (bool): Enable or Disable SNMP agent
-            get_community (str): Public or read only SNMP community string
-            set_community (str): Private or read/write SNMP community string
-            manager_host_1 (str): (IPv4 address) IP address of management host
-            manager_host_2 (str): (IPv4 address) IP address of management host
-            manager_host_3 (str): (IPv4 address) IP address of management host
-            manager_host_subnet_1 (int): CIDR subnet notation for management host network e.g. 24 for /24 network
-            manager_host_subnet_2 (int): CIDR subnet notation for management host network e.g. 24 for /24 network
-            manager_host_subnet_3 (int): CIDR subnet notation for management host network e.g. 24 for /24 network
-
+        :param enable_agent: (bool) Enable or Disable SNMP agent
+        :param get_community: (str) Public or read only SNMP community string
+        :param set_community: (str) Private or read/write SNMP community string
+        :param manager_host_1: (str) (IPv4 address) IP address of management host
+        :param manager_host_2: (str) (IPv4 address) IP address of management host
+        :param manager_host_3: (str) (IPv4 address) IP address of management host
+        :param manager_host_subnet_1: (str) Subnet Mast and Network (CIDR) e.g. "255.255.255.0 /24"
+        :param manager_host_subnet_2: (str) Subnet Mast and Network (CIDR) e.g. "255.255.255.0 /24"
+        :param manager_host_subnet_3: (str) Subnet Mast and Network (CIDR) e.g. "255.255.255.0 /24"
         """
         super().__init__(enable_agent, get_community, set_community)
         self.manager_host_1 = manager_host_1
@@ -178,20 +166,17 @@ class SNMPIPv6(SNMPv1v2):
         manager_host_prelen_2=None,
         manager_host_prelen_3=None,
     ):
-        """
-        SNMPIPv6 - derived from SNMPv1v2 base class.
+        """SNMPIPv6 - derived from SNMPv1v2 base class.
 
-        Args:
-            enable_agent (bool): Enable or Disable SNMP agent
-            get_community (str): Public or read only SNMP community string
-            set_community (str): Private or read/write SNMP community string
-            manager_host_1 (str): (IPv6 address) IP address of management host
-            manager_host_2 (str): (IPv6 address) IP address of management host
-            manager_host_3 (str): (IPv6 address) IP address of management host
-            manager_host_prelen_1 (int): IPv6 prefix length
-            manager_host_prelen_2 (int): IPv6 prefix length
-            manager_host_prelen_3 (int): IPv6 prefix length
-
+        :param enable_agent: (bool) Enable or Disable SNMP agent
+        :param get_community: (str) Public or read only SNMP community string
+        :param set_community: (str) Private or read/write SNMP community string
+        :param manager_host_1: (str) (IPv6 address) IP address of management host
+        :param manager_host_2: (str) (IPv6 address) IP address of management host
+        :param manager_host_3: (str) (IPv6 address) IP address of management host
+        :param manager_host_prelen_1: (int) IPv6 prefix length
+        :param manager_host_prelen_2: (int) IPv6 prefix length
+        :param manager_host_prelen_3: (int) IPv6 prefix length
         """
         super().__init__(enable_agent, get_community, set_community)
         self.manager_host_1 = manager_host_1
@@ -219,14 +204,11 @@ class SNMPTrap:
     """SNMPTrap Base class."""
 
     def __init__(self, community=None, timeout=None):  # noqa: D403
-        """
-        SNMPTrap class.
+        """SNMPTrap class.
 
-        Args:
-            community (str): SNMP community string for TRAP messages
-            timeout (int): How many seconds the device should wait for a response from a trap message,
-                     before deciding to try again or fail.
-
+        :param community: (str) SNMP community string for TRAP messages
+        :param timeout: (int) How many seconds the device should wait for a response from a trap message,
+                        before deciding to try again or fail.
         """
         self.community = community
         self.timeout = timeout
@@ -255,16 +237,13 @@ class SNMPTrapIPv4(SNMPTrap):
     """SNMPTrapIPv4 Object."""
 
     def __init__(self, community=None, timeout=None, host_1=None, host_2=None):
-        """
-        SNMPTrapIPv4 - derived from SNMPTrap base class.
+        """SNMPTrapIPv4 - derived from SNMPTrap base class.
 
-        Args:
-            community (str): SNMP community string for TRAP messages
-            timeout (int): How many seconds the device should wait for a response from a trap message,
-                     before deciding to try again or fail.
-            host_1 (str): (IPv4 address) IP address of trap destination host
-            host_2 (str): (IPv4 address) IP address of trap destination host
-
+        :param community: (str) SNMP community string for TRAP messages
+        :param timeout: (int) How many seconds the device should wait for a response from a trap message,
+                        before deciding to try again or fail.
+        :param host_1: (str) (IPv4 address) IP address of trap destination host
+        :param host_2: (str) (IPv4 address) IP address of trap destination host
         """
         super().__init__(community, timeout)
         self.host_1 = host_1
@@ -281,16 +260,13 @@ class SNMPTrapIPv6(SNMPTrap):
     """SNMPTrapIPv6 Object."""
 
     def __init__(self, community=None, timeout=None, host_1=None, host_2=None):
-        """
-        SNMPTrapIPv6 - derived from SNMPTrap base class.
+        """SNMPTrapIPv6 - derived from SNMPTrap base class.
 
-        Args:
-            community (str): SNMP community string for TRAP messages
-            timeout (int): How many seconds the device should wait for a response from a trap message,
-                     before deciding to try again or fail.
-            host_1 (str): (IPv6 address) IP address of trap destination host
-            host_2(str): (IPv6 address) IP address of trap destination host
-
+        :param community: (str) SNMP community string for TRAP messages
+        :param timeout: (int) How many seconds the device should wait for a response from a trap message,
+                        before deciding to try again or fail.
+        :param host_1: (str) (IPv6 address) IP address of trap destination host
+        :param host_2: (str) (IPv6 address) IP address of trap destination host
         """
         super().__init__(community, timeout)
         self.host_1 = host_1

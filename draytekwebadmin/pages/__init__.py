@@ -1,5 +1,5 @@
 """Selenium Page Objects for Draytek Web Admin."""
-from draytekwebadmin.pages.basepage import BasePage
+from draytekwebadmin.pages.basepageobject import BasePageObject
 from draytekwebadmin.pages.menu_navigator import MenuNavigator
 from draytekwebadmin.pages.login_page import LoginPage
 from draytekwebadmin.pages.management_page import ManagementPage
@@ -9,7 +9,7 @@ from draytekwebadmin.pages.firmware_upgrade_page import FirmwareUpgradePage
 from draytekwebadmin.pages.dashboard_page import DashboardPage
 
 __all__ = [
-    "BasePage",
+    "BasePageObject",
     "MenuNavigator",
     "LoginPage",
     "ManagementPage",

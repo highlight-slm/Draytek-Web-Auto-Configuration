@@ -93,29 +93,28 @@ def valid_community_string(community):
 def valid_ipv4_subnet(subnet):
     """Check if subnet passed is a valid IPv4 subnet for Draytek.
 
-    Args:
-        subnet (int): IPv4 subnet
-
-    Returns:
-        bool: True if valid or None, false otherwise
-
+    :param subnet: IPv4 subnet string
+    :returns: True if valid or None, false otherwise
     """
     if not subnet:  # None or Empty string
         return True
-    if int(subnet) <= IPV4_SUBNET_MAX and int(subnet) >= IPV4_SUBNET_MIN:
-        return True
-    return False
+    try:
+        if (
+            int(subnet.split("/")[1].strip()) <= IPV4_SUBNET_MAX
+            and int(subnet.split("/")[1].strip()) >= IPV4_SUBNET_MIN
+        ):
+            if valid_ipv4_address(subnet.split("/")[0].strip()):
+                return True
+        return False
+    except (IndexError, ValueError) as error:
+        raise ValueError(error)
 
 
 def valid_ipv6_prefix(prefix):
     """Check if prefix passed is a valid IPv6 prefix length.
 
-    Args:
-        prefix (int): IPv6 Prefix length
-
-    Returns:
-        bool: True if valid or None, false otherwise
-
+    :param prefix: IPv6 Prefix length
+    :returns: True if valid or None, false otherwise
     """
     if prefix is None:
         return True
@@ -127,27 +126,19 @@ def valid_ipv6_prefix(prefix):
 def bool_or_none(value):
     """Return boolean equivalent or None for a given value.
 
-    Args:
-        value: value to be parsed
-
-    Returns:
-        bool: None if value=None, else True if truthy or False otherwise
-
+    :param value: value to be parsed
+    returns: None if value=None, else True if truthy or False otherwise
     """
     if value is None:
         return None
-    return str(value).lower() in ["true", "1", "y", "yes"]
+    return str(value).lower() in ["true", "1", "y", "yes", "on"]
 
 
 def int_or_none(value):
     """Return integer equivalent or None for a given value.
 
-    Args:
-        value: value to be parsed
-
-    Returns:
-        int: None if value=None else int(value)
-
+    :param value: value to be parsed
+    :returns: None if value=None else int(value)
     """
     if value is None:
         return None
@@ -157,12 +148,8 @@ def int_or_none(value):
 def port_or_none(value):
     """Return integer port number or None for a given value.
 
-    Args:
-        value: value to be parsed
-
-    Returns:
-        port: None if value=None else int(value)
-
+    :param value: value to be parsed
+    :returns: Valid port number, None if value=None else int(value)
     """
     port = int_or_none(value)
     if port is not None and port > MAX_PORT:

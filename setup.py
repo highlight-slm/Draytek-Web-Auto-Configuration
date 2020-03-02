@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 PACKAGES = find_packages(exclude=["tests", "tests.*"])
 
-REQUIRES = ["selenium>=3.141.0", "selenium-page-elements==0.1.6"]
+REQUIRES = ["toolium>=1.6.1", "tabulate==0.8.6"]
 
 PROJECT_CLASSIFIERS = [
     "Intended Audience :: Developers",
@@ -16,19 +16,19 @@ PROJECT_CLASSIFIERS = [
 
 setup(
     name="draytekwebadmin",
-    version="0.0.1",
+    version="0.1.0",
     license="MIT",
     url="https://github.com/highlight-slm/Draytek-Web-Auto-Configuration",
     download_url="https://github.com/highlight-slm/Draytek-Web-Auto-Configuration",
     author="Martin Rowan",
     author_email="martin@rowannet.co.uk",
-    description="Selenium based web API to configure DrayTek routers",
+    description="Web UI automation to configure DrayTek routers",
     packages=PACKAGES,
     include_package_data=True,
     zip_safe=True,
     platforms="any",
     install_requires=REQUIRES,
     test_suite="tests",
-    keywords=["draytek", "selenium"],
+    keywords=["draytek", "selenium", "toolium"],
     classifiers=PROJECT_CLASSIFIERS,
 )

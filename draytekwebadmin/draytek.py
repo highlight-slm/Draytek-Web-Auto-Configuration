@@ -2,7 +2,7 @@
 
 import logging
 
-from draytekwebadmin.driver import load_driver, unload_driver
+from draytekwebadmin.driver import TooliumSession
 from draytekwebadmin.pages import (
     LoginPage,
     SNMPpage,
@@ -20,7 +20,7 @@ from draytekwebadmin.utils import (
 )
 
 LOGGER = logging.getLogger("root")
-LOGGER.setLevel(logging.INFO)
+LOGGER.setLevel(logging.ERROR)
 
 
 class DrayTekWebAdmin:
@@ -33,34 +33,28 @@ class DrayTekWebAdmin:
         password=None,
         port=443,
         use_https=True,
-        browsername="",
-        headless=False,
+        config_dir=None,
     ):
-        """
-        Create a web session to the web administration console.
+        """Create a web session to the web administration console.
 
-        Args:
-            hostname: IP address or DNS name of Web admin interface on the router
-            port: (optional) Port running the web admin console (Default: 443)
-            username: Web admin account username (default: admin)
-            password: Password for admin account
-            use_https: (optional) Use https instead of http (Default: True)
-            browsername: (optional) Name of browser to attempt to use, will attempt to auto-detect if blank
-            headless: (optional) Use a headless browser session if possible (Default: False)
-
+        :param hostname: IP address or DNS name of Web admin interface on the router
+        :param port: (optional) Port running the web admin console (Default: 443)
+        :param username: Web admin account username (default: admin)
+        :param password: Password for admin account
+        :param use_https: (optional) Use https instead of http (Default: True)
+        :param config_dir: (optional) Path to toolium configuration files
         """
         self.hostname = hostname
         self.port = port
         self.username = username
         self.password = password
         self.use_https = use_https
-        self.browsername = browsername
-        self.headless = headless
+        self.config_dir = config_dir
         self.loggedin = False
         self.reboot_required = False
         self.routerinfo = None
-        self._driver = None
         self._url = None
+        self._session = None
 
     def __setattr__(self, name, value):
         if name == "hostname":
@@ -70,97 +64,76 @@ class DrayTekWebAdmin:
                 or valid_ipv6_address(value)
             ):
                 raise ValueError(f"Invalid hostname: {value}")
-        if name in ["use_https", "headless", "loggedin", "reboot_required"]:
+        if name in ["use_https", "loggedin", "reboot_required"]:
             value = bool_or_none(value)
         elif name == "port":
             value = port_or_none(value)
         super(DrayTekWebAdmin, self).__setattr__(name, value)
 
     @property
-    def driver(self):
-        """Return current webdriver instance, creating if needed.
+    def session(self):
+        """Return toolium session instance, creating if needed.
 
-        Args: None
-
-        Returns:WebDriver instance
-
+        :returns: TODO!
+        :rtype: TODO!
         """
-        if self._driver is None:
+        if self._session is None:
             try:
-                LOGGER.info("Creating WebDriver and opening session")
-                self._driver = load_driver(self.browsername, self.headless)
-                self._driver.get(self.url)
-                LOGGER.info("Connected to Router")
+                LOGGER.info("Creating and opening session")
+                self._session = TooliumSession()
+                self._session.setUp(configuration_directory=self.config_dir)
+                self._session.driver.get(self.url)
+                LOGGER.info(f"Connected to: {self.url} - {self._session.driver.title}")
             except Exception:
                 self.close_session()
                 raise RuntimeError(
                     "Unable to navigate to DrayTek Web Administration Console"
                 )
-        return self._driver
+        return self._session
 
     @property
     def url(self):
         """Construct the url for the Web Administration Console.
 
-        Args: None
-
-        Returns:
-            url: Formatted URL string for Web Administaton Console
-
+        :returns: Formatted URL string for Web Administration Console
         """
         LOGGER.info("Building URL for Management Console")
         web_protocol = "https"
         if not self.use_https:
             web_protocol = "http"
             LOGGER.warning(
-                "Using HTTP connnection is insecure, please reconfigure your system to use HTTPS."
+                "Using HTTP connection is insecure, please reconfigure your system to use HTTPS."
             )
         self._url = f"{web_protocol}://{self.hostname}:{self.port}"
         return self._url
 
     def start_session(self):
-        """Start selenium webdriver session.
+        """Start selenium webdriver session via toolium.
 
-           Logs user in, if not already logged in.
-           Collects basic RouterInfo
-
-        Args: None
-
-        Returns:
-            None or Exception
-
+        Logs user in, if not already logged in.
+        Collects basic RouterInfo
         """
         if not self.loggedin:
             self.login()
-            self.routerinfo = DashboardPage(self.driver).routerinfo()
+            self.routerinfo = DashboardPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).routerinfo()
             LOGGER.info(
                 f"Connected to: {self.hostname} - {self.routerinfo.router_name} - "
                 f"{self.routerinfo.model} - {self.routerinfo.firmware}"
             )
 
     def close_session(self):
-        """Close selenium webdriver session.
-
-        Args: None
-
-        Returns:
-            None or Exception
-
-        """
-        if self._driver:
-            unload_driver(self.driver)
+        """Close selenium webdriver session."""
+        if self._session:
+            self._session.tearDown()
 
     def login(self):
-        """Login to the DrayTek Web Administration Console. If login successful then loggedin property set to True.
-
-        Args: None
-
-        Returns:
-            None or Exception
-
-        """
+        """Login to the DrayTek Web Administration Console. If login successful then loggedin property set to True."""
         LOGGER.info("Opening Login Page.")
-        loginpage = LoginPage(self.driver)
+        loginpage = LoginPage(
+            driver_wrapper=self.session.driver_wrapper
+        ).wait_until_loaded()
         loginpage.login(self.username, self.password)
         if loginpage.login_error():
             # TODO (#4414): Need to fix
@@ -174,33 +147,29 @@ class DrayTekWebAdmin:
     def read_settings(self, settings):
         """Read Router Settings for a specified type.
 
-        Args:
-            settings: Object of the type of settings requested
-
-        Returns:
-            object: of Type requested with the current settings
-
+        :param settings: Object of the type of settings requested
+        :returns: object: of Type requested with the current settings
         """
         name = settings.__name__
         self.start_session()
         LOGGER.info(f"Reading {name} Settings.")
         if name == "SNMPIPv4":
-            return SNMPpage(self.driver).read_snmp_ipv4_settings()
+            return SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_snmp_ipv4_settings()
         # if name == "SNMPIPv6":
-        #     return SNMPpage(self.driver).read_SNMPIPv6_settings()
+        #     return SNMPpage(driver_wrapper=self.session.driver_wrapper).read_SNMPIPv6_settings()
         if name == "InternetAccessControl":
-            return ManagementPage(self.driver).read_internet_access_control_settings()
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_internet_access_control_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
         """Apply Router Settings for a specified type. Update property if changes require a device reboot.
 
-        Args:
-            settings: Object cointaining the settings to apply
-
-        Returns:
-            reboot required: True if changes resulted in a reboot being required
-
+        :param settings: Object containing the settings to apply
+        :returns: True if changes resulted in a reboot being required
         """
         reboot_req = False
         name = type(settings).__name__
@@ -209,13 +178,14 @@ class DrayTekWebAdmin:
         LOGGER.info(f"Applying new {name} Settings.")
 
         if name == "SNMPIPv4":
-            reboot_req = SNMPpage(self.driver).write_snmp_ipv4_settings(settings)
-            # return SNMPpage(self.driver).write_SNMPIPv4_settings(settings)
+            reboot_req = SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_snmp_ipv4_settings(settings)
         # elif name == "SNMPIPv6":
-        #     reboot_req = SNMPpage(self.driver).write_SNMPIPv6_settings(settings)
+        #     reboot_req = SNMPpage(driver_wrapper=self.session.driver_wrapper).write_SNMPIPv6_settings(settings)
         elif name == "InternetAccessControl":
             reboot_req = ManagementPage(
-                self.driver
+                driver_wrapper=self.session.driver_wrapper
             ).write_internet_access_control_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
@@ -225,33 +195,25 @@ class DrayTekWebAdmin:
         return reboot_req
 
     def reboot(self):
-        """Reboot Router - System Maintenance >> Reboot System.
-
-        Args: None
-
-        Returns: None
-
-        """
+        """Reboot Router - System Maintenance >> Reboot System."""
         self.start_session()
         LOGGER.info("Rebooting Router.")
-        RebootSystemPage(self.driver).reboot()
+        RebootSystemPage(driver_wrapper=self.session.driver_wrapper).reboot()
         self.reboot_required = False
 
     def upgrade_preview(self, firmware):
         """Preview firmware upgrade - System Maintenance >> Firmware Upgrade.
 
-        Args:
-            firmware: Firmware object containing full file path for new firmware
-
-        Returns:
-            Firmware object: Properties set for based on the previewing the firmware
-
+        :param firmware: Firmware object containing full file path for new firmware
+        :returns: Firmware object: Properties set for based on the previewing the firmware
         """
         if firmware.filepath is None:
             return ValueError("Firmware filepath not set")
         self.start_session()
         LOGGER.info("Opening firmware page for preview")
-        new_firmware = FirmwareUpgradePage(self.driver).new_firmware_preview(firmware)
+        new_firmware = FirmwareUpgradePage(
+            driver_wrapper=self.session.driver_wrapper
+        ).new_firmware_preview(firmware)
         # Patch in the current firmware version which oddly isn't shown on the preview page
         new_firmware.firmware_current = self.routerinfo.firmware
         return new_firmware
@@ -259,18 +221,16 @@ class DrayTekWebAdmin:
     def upgrade(self, firmware):
         """Upgrade firmware - System Maintenance >> Firmware Upgrade.
 
-        Args:
-            firmware: Firmware object containing full file path for new firmware
-
-        Returns:
-            Upgrading: (bool) True if firmware is being updated and router rebooted
-
+        :param firmware: Firmware object containing full file path for new firmware
+        :returns: (bool) True if firmware is being updated and router rebooted
         """
         if firmware.filepath is None:
             return ValueError("Firmware filepath not set")
         self.start_session()
         LOGGER.info("Opening firmware page for upgrade")
-        upgrading = FirmwareUpgradePage(self.driver).new_firmware_install(firmware)
+        upgrading = FirmwareUpgradePage(
+            driver_wrapper=self.session.driver_wrapper
+        ).new_firmware_install(firmware)
         if upgrading:
             LOGGER.info("Upgraded firmware and rebooted")
             return True

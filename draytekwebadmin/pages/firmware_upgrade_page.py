@@ -1,40 +1,34 @@
 """Draytek Web Admin - Firmware Upgrade Page."""
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from page_elements import Element
+from toolium.pageelements import Button, Text
 
 from draytekwebadmin.firmware import Firmware
-from draytekwebadmin.pages.basepage import BasePage
 from draytekwebadmin.pages.menu_navigator import MenuNavigator
+from draytekwebadmin.pages.basepageobject import BasePageObject
 
 
-class FirmwareUpgradePage(BasePage):
+class FirmwareUpgradePage(BasePageObject):
     """Selenium Page Object Model: FirmwareUpgradePage."""
 
     # Page Elements
-    choose_firmware_button = Element(
-        By.ID, "fw_file", wait=EC.presence_of_element_located, wait_timeout=5
-    )
-    firmware_path_form_element = Element(
+    choose_firmware_button = Button(By.ID, "fw_file")
+    firmware_path_form_element = Button(
         By.CSS_SELECTOR, "input[type='file']"
     )  # Might not be needed
-    upgrade_button = Element(
+    upgrade_button = Button(
         By.XPATH, "//input[@name='attach' and @type='button' and @value='Upgrade']"
     )
-    preview_button = Element(By.NAME, "btnpreview")
-    post_upgrade_restart_button = Element(
-        By.XPATH,
-        "//input[@type='button' and @value='Restart']",
-        wait=EC.presence_of_element_located,
-        wait_timeout=120,
+    preview_button = Button(By.NAME, "btnpreview")
+    post_upgrade_restart_button = Button(
+        By.XPATH, "//input[@type='button' and @value='Restart']"
     )
 
-    preview_close_button = Element(By.NAME, "btnClose")
-    preview_model = Element(By.ID, "smodelName")
-    preview_firmware_version = Element(By.ID, "sfwversion")
-    preview_modem_version = Element(By.ID, "scurmdmver")
-    preview_current_modem_version = Element(By.ID, "snewmdmver")
+    preview_close_button = Button(By.NAME, "btnClose")
+    preview_model = Text(By.ID, "smodelName")
+    preview_firmware_version = Text(By.ID, "sfwversion")
+    preview_modem_version = Text(By.ID, "scurmdmver")
+    preview_current_modem_version = Text(By.ID, "snewmdmver")
 
     def open_page(self):
         """Navigate menus to open Firmware Upgrade page.
@@ -44,7 +38,7 @@ class FirmwareUpgradePage(BasePage):
         Returns: None
 
         """
-        menu = MenuNavigator(self.driver)
+        menu = MenuNavigator(self.driver_wrapper)
         menu.open_sysmain_firmware_upgrade()
 
     def new_firmware_preview(self, file: Firmware):
@@ -62,16 +56,16 @@ class FirmwareUpgradePage(BasePage):
 
         self.open_page()
 
-        self.choose_firmware_button.send_keys(str(file.filepath))
+        self.choose_firmware_button.web_element.send_keys(str(file.filepath))
         self.preview_button.click()
         preview_firmware = Firmware(
             filepath=str(file.filepath),
-            model=self.read_element_text(self.preview_model),
-            firmware_target=self.read_element_text(self.preview_firmware_version),
-            modem_firmware_current=self.read_element_text(
+            model=self.read_element_value(self.preview_model),
+            firmware_target=self.read_element_value(self.preview_firmware_version),
+            modem_firmware_current=self.read_element_value(
                 self.preview_current_modem_version
             ),
-            modem_firmware_target=self.read_element_text(self.preview_modem_version),
+            modem_firmware_target=self.read_element_value(self.preview_modem_version),
         )
         self.preview_close_button.click()
 
@@ -90,7 +84,7 @@ class FirmwareUpgradePage(BasePage):
 
         """
         self.open_page()
-        self.choose_firmware_button.send_keys(str(file.filepath))
+        self.choose_firmware_button.web_element.send_keys(str(file.filepath))
         self.upgrade_button.click()
         self.driver.switch_to.alert.accept()
         self.post_upgrade_restart_button.click()

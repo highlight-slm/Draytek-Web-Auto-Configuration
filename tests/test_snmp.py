@@ -79,7 +79,12 @@ class TestSNMPIPv4(unittest.TestCase):
         self.assertEqual(
             "192.168.0.1", SNMPIPv4(manager_host_1="192.168.0.1").manager_host_1
         )
-        self.assertEqual(32, SNMPIPv4(manager_host_subnet_2=32).manager_host_subnet_2)
+        self.assertEqual(
+            "255.255.255.255 / 32",
+            SNMPIPv4(
+                manager_host_subnet_2="255.255.255.255 / 32"
+            ).manager_host_subnet_2,
+        )
 
     def test_validation(self):
         with self.assertRaises(ValueError):
@@ -91,7 +96,7 @@ class TestSNMPIPv4(unittest.TestCase):
         with self.assertRaises(ValueError):
             SNMPIPv4(manager_host_3="google.com")
         with self.assertRaises(ValueError):
-            SNMPIPv4(manager_host_subnet_1=16)
+            SNMPIPv4(manager_host_subnet_1="255.255.0.0 / 16")
 
 
 class TestSNMPIPv6(unittest.TestCase):

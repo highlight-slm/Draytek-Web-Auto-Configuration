@@ -68,6 +68,7 @@ confidence=
 # logging-format-interpolation - fstrings should be fine even for logging https://github.com/PyCQA/pylint/issues/2354
 # fixme - TODOs are already flagged for placeholder functionality. Ok to disable whilst in development.
 # bad-continuation - 'black' formatted files trigger this false positive
+# arguments-differ - Potential false positive: https://github.com/PyCQA/pylint/issues/1553
 
 disable=print-statement,
         parameter-unpacking,
@@ -160,7 +161,8 @@ disable=print-statement,
         multiple-statements,
         logging-format-interpolation,
         fixme,
-        bad-continuation
+        bad-continuation,
+        arguments-differ
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

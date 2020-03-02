@@ -1,116 +1,31 @@
-"""Draytek Web Admin - Selenium Web Driver selector."""
-
+"""Draytek Web Admin - Toolium Session."""
+from os import getcwd
+from pathlib import Path
 import logging
-from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
+from toolium import test_cases
 
 LOGGER = logging.getLogger("root")
 
 
-def load_driver(browser_name="", headless=False):
-    """Create a Selenium WebDriver instance. Will attempt to auto-detect if browserName not set.
+class TooliumSession(test_cases.SeleniumTestCase):
+    """Toolium Session."""
 
-    Args:
-        browserName: Browser Name [FireFox, Chrome, IE, Edge] (case insensitive)
-        headless: (optional) Set to True to run without the web page being visible (Default: False)
+    def setUp(self, configuration_directory=None):
+        """Override setUp function to enable config file directory to be configured.
 
-    Returns:
-        webdriver: Selenium WebDriver instance
-
-    """
-    LOGGER.info(
-        f"Loading Webdriver - BrowserName: {browser_name} - Headless: {headless}"
-    )
-    if browser_name.upper() == "FIREFOX":
-        return load_firefox(headless)
-    if browser_name.upper() == "CHROME":
-        return load_chrome(headless)
-    if browser_name.upper() == "EDGE":
-        return load_edge()
-    if browser_name:
-        raise Exception(
-            f"Unable to start Selenium Webdriver for browser: {browser_name}"
+        :param configuration_directory: path to config file location
+        """
+        self.config_files.set_config_properties_filenames(
+            "properties.cfg", "local-properties.cfg"
         )
-
-    # Browser not specified, first one that works will be returned.
-    LOGGER.debug(
-        "Loading Webdriver - BrowserName not specified, attempting each supported browser"
-    )
-    try:
-        return load_firefox(headless)
-    except WebDriverException:
-        try:
-            return load_chrome(headless)
-        except WebDriverException:
-            try:
-                return load_edge()
-            except WebDriverException as error:
-                raise Exception(f"Unable to find suitable browser. Error {error}")
-
-
-def unload_driver(driver):
-    """Shutdown given webdriver instance.
-
-    Args:
-        driver (selenium.webdriver): The running webdriver instance
-
-    """
-    driver.quit()
-
-
-def load_firefox(headless):
-    """Create Firefox Selenium WebDriver.
-
-    Args:
-        headless: Set to True to run without the web page being visble
-
-    Returns:
-        webdriver: FireFox Selenium WebDriver instance
-
-    """
-    LOGGER.info("Loading Webdriver - Firefox")
-    options = webdriver.FirefoxOptions()
-    options.headless = headless
-    desired_capabilities = DesiredCapabilities.FIREFOX.copy()
-    desired_capabilities["acceptInsecureCerts"] = True
-    driver = webdriver.Firefox(
-        firefox_options=options, capabilities=desired_capabilities
-    )
-    driver.maximize_window()
-    return driver
-
-
-def load_chrome(headless):
-    """Create Chrome Selenium WebDriver.
-
-    Args:
-        headless: Set to True to run without the web page being visible
-
-    Returns:
-        webdriver: Chrome Selenium WebDriver instance
-
-    """
-    LOGGER.info("Loading Webdriver - Chrome")
-    options = webdriver.ChromeOptions()
-    options.add_argument("--start-maximized")
-    options.headless = headless
-    desired_capabilities = DesiredCapabilities.CHROME.copy()
-    desired_capabilities["acceptInsecureCerts"] = True
-    return webdriver.Chrome(
-        chrome_options=options, desired_capabilities=desired_capabilities
-    )
-
-
-def load_edge():
-    """Create Edge Selenium WebDriver.
-
-    Args:
-        None
-
-    Returns:
-        webdriver: Edge Selenium WebDriver instance
-
-    """
-    LOGGER.info("Loading Webdriver - Edge")
-    return webdriver.Edge()
+        if configuration_directory:
+            self.config_files.set_config_directory(str(configuration_directory))
+        else:
+            conf_dir = Path(getcwd(), "conf")
+            if not Path.exists(conf_dir):
+                conf_dir = Path(getcwd(), "draytekwebadmin", "conf")
+            if Path.exists(conf_dir):
+                self.config_files.set_config_directory(str(conf_dir))
+        super(TooliumSession, self).setUp()

@@ -3,6 +3,7 @@
 import argparse
 import csv
 import logging
+import time
 from urllib.parse import urlparse
 
 from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
@@ -10,18 +11,13 @@ from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
 LOGGER = logging.getLogger("root")
 FORMAT = "[%(levelname)s] %(message)s"
 logging.basicConfig(format=FORMAT)
-LOGGER.setLevel(logging.WARNING)
+LOGGER.setLevel(logging.ERROR)
 
 
 def _get_parser():
     """Parse command line arguments.
 
-    Args:
-        None
-
-    Returns:
-        parser: argparse object
-
+    :returns: argparse object
     """
     parser = argparse.ArgumentParser(
         description="Write DrayTek router settings from a source CSV file."
@@ -46,18 +42,18 @@ def _get_parser():
         help="Show what changes would be made, does not make any change to current configuration",
     )
     parser.add_argument(
-        "--not-headless",
-        dest="headless",
-        action="store_false",
-        default=True,
-        help="Show the browser session, do not run headless",
-    )
-    parser.add_argument(
         "--no-reboot",
         dest="reboot",
         action="store_false",
         default=True,
         help="Do not reboot routers after configuration change, even if required",
+    )
+    parser.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Run in debug mode, errors will attempt to capture Web Admin page",
     )
     return parser
 
@@ -65,12 +61,8 @@ def _get_parser():
 def parse_address_url_to_host(address):
     """Convert URL to host, port and use HTTPs flag
 
-    Args:
-        address: URL for Webadmin console
-
-    Returns:
-        host, port, useHTTPs tuple
-
+    :param address: URL for Webadmin console
+    :returns: host, port, useHTTPs tuple
     """
     url = urlparse(address)
     port = url.port
@@ -87,12 +79,8 @@ def parse_address_url_to_host(address):
 def read_csv(csvfilename):
     """Read data from CSV file into dictionary
 
-    Args:
-        filename: output filename for csv
-
-    Returns:
-        dict_list: dictionary of csv contents
-
+    :param filename: output filename for csv
+    :returns: dict_list - dictionary of csv contents
     """
     with open(csvfilename, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -105,13 +93,9 @@ def read_csv(csvfilename):
 def diff(current, new):
     """ Compare two sets of router module settings
 
-    Args:
-        current: current router settings
-        new: router settings to be applied
-
-    Returns:
-        List of strings showing differences
-
+    :param current: current router settings
+    :param new: router settings to be applied
+    :returns: List of strings showing differences
     """
     differences = []
     # Convert to dictionary
@@ -134,18 +118,13 @@ def diff(current, new):
     return differences
 
 
-def configure_router(router, allow_reboot, headless=True, whatif=False):
+def configure_router(router, allow_reboot, whatif=False, debug=False):
     """ Apply router configuration specified
 
-    Args:
-        router: row from CSV with settings for a single router
-        allow_reboot: reboot router if required after config change
-        headless: display of browser session when interacting with router
-        whatif: Compares settings does not write changes to router
-
-    Returns:
-        None
-
+    :param router: row from CSV with settings for a single router
+    :param allow_reboot: reboot router if required after config change
+    :param whatif: Compares settings does not write changes to router
+    :param debug: write a debug files of the page source on exception
     """
     webadmin_session = None
     reboot_required = False
@@ -154,7 +133,6 @@ def configure_router(router, allow_reboot, headless=True, whatif=False):
         settings = extract_settings(router)
 
         webadmin_session = settings["connection"]
-        webadmin_session.headless = headless
         # Not strictly needed, since configuring modules will trigger connect.
         # But this way we can ensure we ensure we can connect ourside the for loop.
         webadmin_session.start_session()
@@ -187,10 +165,23 @@ def configure_router(router, allow_reboot, headless=True, whatif=False):
                 )
         else:
             print(f"Router: {webadmin_session.hostname} - Reconfiguration completed")
-        # TODO: Have a list of completed devices, and ones with pending reboots, report sucess or fail?
-
-    except RuntimeError as exception:
+        # TODO: Have a list of completed devices, and ones with pending reboots, report success or fail?
+    except Exception as exception:
         LOGGER.critical(exception)
+        if webadmin_session is not None:
+            if debug:
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                # Collect the information from the session object and close it before attempting file access in case that fails
+                # This avoids having another try/except/finally block within this error handling routine.
+                hostname = webadmin_session.hostname
+                page_source = webadmin_session.session.driver.page_source
+                webadmin_session.close_session()
+
+                debugfile = open(
+                    f"draytek_write_settings_debug-{hostname}-{timestamp}.html", "w+"
+                )
+                debugfile.write(page_source)
+                debugfile.close()
     finally:
         if webadmin_session is not None:
             webadmin_session.close_session()
@@ -199,13 +190,9 @@ def configure_router(router, allow_reboot, headless=True, whatif=False):
 def extract_settings(router_settings, separator="|"):
     """Extracts settings from csv file into dictionaries. Logs errors if unexpected modulenames found in header.
 
-    Args:
-        router: row from CSV with settings for a single router
-        separator: character used to separate modules from fields (default '|')
-
-    Returns:
-        settings: dictionary of dictionaries containing extracted data from csv
-
+    :param router: row from CSV with settings for a single router
+    :param separator: character used to separate modules from fields (default '|')
+    :returns: settings - dictionary of dictionaries containing extracted data from csv
     """
     connection = DrayTekWebAdmin()
     info = {}
@@ -249,24 +236,13 @@ def extract_settings(router_settings, separator="|"):
 def create_template_csv(output_file):
     """Create a template CSV with just the data headers
 
-    Args:
-        output_file: filename to save template as
-
-    Returns:
-        None
-
+    :param output_file: filename to save template as
     """
     raise NotImplementedError
 
 
 def main():
     """Main. Called when program called directly from the command line.
-
-    Args:
-        None
-
-    Returns:
-        None
 
     """
     argv = None
@@ -282,14 +258,11 @@ def main():
                 configure_router(
                     router=router,
                     allow_reboot=args.reboot,
-                    headless=args.headless,
                     whatif=args.whatif,
+                    debug=args.debug,
                 )
         except FileNotFoundError:
             LOGGER.critical(f"Input file not found: {args.inputfile}")
-        # TODO:
-        # Parallel execution
-
     else:
         parser.print_help()
 

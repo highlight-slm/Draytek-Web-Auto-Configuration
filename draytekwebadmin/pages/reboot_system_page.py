@@ -1,23 +1,23 @@
 """Draytek Web Admin - Reboot System Page."""
 
 from selenium.webdriver.common.by import By
-from page_elements import Element
+from toolium.pageelements import Button, InputRadio
 
-from draytekwebadmin.pages.basepage import BasePage
 from draytekwebadmin.pages.menu_navigator import MenuNavigator
+from draytekwebadmin.pages.basepageobject import BasePageObject
 
 
-class RebootSystemPage(BasePage):
+class RebootSystemPage(BasePageObject):
     """Selenium Page Object Model: RebootSystemPage."""
 
     # Page Elements
-    current_settings_radio = Element(
+    current_settings_radio = InputRadio(
         By.XPATH, "//input[@name='sReboot' and @type='radio' and @value='Current']"
     )
-    factory_settings_radio = Element(
+    factory_settings_radio = InputRadio(
         By.XPATH, "//input[@name='sReboot' and @type='radio' and @value='Default']"
     )
-    reboot_now_button = Element(By.NAME, "submitbnt")
+    reboot_now_button = Button(By.NAME, "submitbnt")
 
     # TODO (#4074): Add Support for scheduling a reboot
 
@@ -29,7 +29,7 @@ class RebootSystemPage(BasePage):
         Returns: None
 
         """
-        menu = MenuNavigator(self.driver)
+        menu = MenuNavigator(self.driver_wrapper)
         menu.open_sysmain_reboot_system()
 
     def reboot(self):

@@ -3,6 +3,7 @@
 import argparse
 import csv
 import logging
+import time
 from urllib.parse import urlparse
 
 from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
@@ -10,18 +11,13 @@ from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
 LOGGER = logging.getLogger("root")
 FORMAT = "[%(levelname)s] %(message)s"
 logging.basicConfig(format=FORMAT)
-LOGGER.setLevel(logging.WARNING)
+LOGGER.setLevel(logging.ERROR)
 
 
 def _get_parser():
     """Parse command line arguments.
 
-    Args:
-        None
-
-    Returns:
-        parser: argparse object
-
+    :returns: argparse object
     """
     parser = argparse.ArgumentParser(
         description="Read DrayTek router settings. Saving the result to a CSV file."
@@ -55,11 +51,11 @@ def _get_parser():
         help="Output data file (default: draytek-out.csv)",
     )
     parser.add_argument(
-        "--not-headless",
-        dest="headless",
-        action="store_false",
-        default=True,
-        help="Show the browser session, do not run headless",
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Run in debug mode, errors will attempt to capture Web Admin page",
     )
     return parser
 
@@ -67,12 +63,8 @@ def _get_parser():
 def parse_address_url_to_host(address):
     """Convert URL to host, port and use HTTPs flag
 
-    Args:
-        address: URL for Webadmin console
-
-    Returns:
-        host, port, useHTTPs tuple
-
+    :param address: URL for Webadmin console
+    :returns: host, port, useHTTPs tuple
     """
     url = urlparse(address)
     port = url.port
@@ -89,12 +81,8 @@ def parse_address_url_to_host(address):
 def read_data(session):
     """Read router configuration
 
-    Args:
-        session: draytekwebadmin session object
-
-    Returns:
-        data: Dictionary of all collected values
-
+    :param session: draytekwebadmin session object
+    :returns: data - Dictionary of all collected values
     """
     # Get connection properties to save to CSV useful for later scripted changes
     wanted_session_properties = [
@@ -129,14 +117,10 @@ def read_data(session):
 def prefixKeys(data, prefix, separator):
     """Prefix dictionary keys
 
-    Args:
-        data: dictionary of data
-        prefix: value to prefix keys with
-        separator: character between prefix and original key name
-
-    Returns:
-        prefixed: dictionary with updated key names
-
+    :param data: dictionary of data
+    :param prefix: value to prefix keys with
+    :param separator: character between prefix and original key name
+    :returns: prefixed - dictionary with updated key names
     """
     prefixed = {}
     if type(data) is dict:
@@ -149,13 +133,8 @@ def prefixKeys(data, prefix, separator):
 def save_to_csv(data, filename):
     """Save data to CSV file
 
-    Args:
-        data: dictionary of data to be saved
-        filename: output filename for csv
-
-    Returns:
-        None
-
+    :param data: dictionary of data to be saved
+    :param filename: output filename for csv
     """
     with open(filename, "w", newline="") as outfile:
         csvfile = csv.DictWriter(outfile, data.keys(), dialect="excel")
@@ -166,18 +145,7 @@ def save_to_csv(data, filename):
 def main():
     """Main. Called when program called directly from the command line.
 
-    Args:
-        None
-
-    Returns:
-        None
-
     """
-    #
-    # TODO: Read connection info from file to allow bulk read of settings
-    #       output filename to include date and time?
-    #
-
     argv = None
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -190,13 +158,26 @@ def main():
             use_https=https,
             username=args.user,
             password=args.password,
-            headless=args.headless,
         )
         webadmin_session.start_session()
         dataset = read_data(webadmin_session)
         save_to_csv(dataset, args.output)
-    except RuntimeError as exception:
+    except Exception as exception:
         LOGGER.critical(exception)
+        if webadmin_session is not None:
+            if args.debug:
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                # Collect the information from the session object and close it before attempting file access in case that fails
+                # This avoids having another try/except/finally block within this error handling routine.
+                hostname = webadmin_session.hostname
+                page_source = webadmin_session.session.driver.page_source
+                webadmin_session.close_session()
+
+                debugfile = open(
+                    f"draytek_read_settings_debug-{hostname}-{timestamp}.html", "w+"
+                )
+                debugfile.write(page_source)
+                debugfile.close()
     finally:
         if webadmin_session is not None:
             webadmin_session.close_session()

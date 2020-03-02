@@ -38,16 +38,16 @@ The following devices and firmware versions have been tested. It is likely that 
 
 ## Requirements
 
-This utility uses Python with Selenium Web Driver in order to interact with the DrayTek Web Management console. In order to run this utility you will need to install:
+This utility uses Python with Selenium Web Driver (using toolium as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
 
 - Python 3.6 (or later)
-- Python binding for [Selenium](https://pypi.org/project/selenium/)
+- Required libraries detailed in requirements.txt
 
 To install requirements: `pip install -r requirements.txt`
 
 ### Supported Browsers
 
-Depending on which Web Browser you have installed you will need the appropriate driver, placing the executable in the same directory as this library. Note that the drivers are linked to the specific browser version, please check and install the correct version.
+Depending on which Web Browser you have installed you will need the appropriate driver. The path to the driver needs to be defined in `conf\properties.cfg`.
 
 - Chrome - requires [ChromeDriver](http://chromedriver.chromium.org/)
 - Firefox - requires [GeckoDriver](https://github.com/mozilla/geckodriver/releases)

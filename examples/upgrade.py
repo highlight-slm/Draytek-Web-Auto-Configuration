@@ -4,6 +4,8 @@ import argparse
 import csv
 import logging
 import time
+from os import getcwd
+from pathlib import Path
 
 from tabulate import tabulate
 
@@ -19,12 +21,7 @@ LOGGER.setLevel(logging.ERROR)
 def _get_parser():
     """Parse command line arguments.
 
-    Args:
-        None
-
-    Returns:
-        parser: argparse object
-
+    :returns: argparse object
     """
     parser = argparse.ArgumentParser(
         description="Upgrade Draytek Router firmware from a source CSV file"
@@ -49,31 +46,33 @@ def _get_parser():
         help="Perform firmware upgrade (inc reboot), preview only",
     )
     parser.add_argument(
-        "--not-headless",
-        dest="headless",
-        action="store_false",
-        default=True,
-        help="Show the browser session, do not run headless",
-    )
-    parser.add_argument(
         "-d",
         "--debug",
         action="store_true",
         default=False,
         help="Run in debug mode, errors will attempt to capture Web Admin page",
     )
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=dir_path,
+        help=r"Location of configuration file directory e.g. -c c:\upgrade\conf",
+    )
     return parser
+
+
+def dir_path(string):
+    if Path.exists(Path(string)):
+        return string
+    else:
+        raise NotADirectoryError(string)
 
 
 def read_csv(csvfilename):
     """Read data from CSV file into dictionary
 
-    Args:
-        filename: output filename for csv
-
-    Returns:
-        dict_list: dictionary of csv contents
-
+    :param filename: output filename for csv
+    :returns: dictionary of csv contents
     """
     with open(csvfilename, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -83,27 +82,21 @@ def read_csv(csvfilename):
     return dict_list
 
 
-def check_upgrade_router(router, headless, debug=False):
-    """ Check Upgrade firmware on Draytek Router
+def check_upgrade_router(router, config_dir=None, debug=False):
+    """Check Upgrade firmware on Draytek Router
 
-    Args:
-        router: row from CSV with settings for a single router
-        headless: display of browser session when interacting with router
-
-    Returns:
-        session: DraytekWebAdmin Session object
-        preview: DraytekWebAdmin Firmware object
-
-
+    :param router: row from CSV with settings for a single router
+    :param config_dir: path to configuration file for toolium
+    :param debug: write a debug files of the page source on exception
+    :returns: DraytekWebAdmin Session object
+    :returns: DraytekWebAdmin Firmware object
     """
     webadmin_session = None
 
     try:
-        settings = extract_settings(router)
+        settings = extract_settings(router, config_dir)
 
         webadmin_session = settings["connection"]
-        webadmin_session.headless = headless
-
         preview = webadmin_session.upgrade_preview(
             Firmware(filepath=settings["firmware"].filepath)
         )
@@ -117,7 +110,7 @@ def check_upgrade_router(router, headless, debug=False):
                 # Collect the information from the session object and close it before attempting file access in case that fails
                 # This avoids having another try/except/finally block within this error handling routine.
                 hostname = webadmin_session.hostname
-                page_source = webadmin_session.driver.page_source
+                page_source = webadmin_session.session.driver.page_source
                 webadmin_session.close_session()
 
                 debugfile = open(
@@ -131,24 +124,30 @@ def check_upgrade_router(router, headless, debug=False):
         return None, None
 
 
-def extract_settings(router_settings, separator="|"):
+def extract_settings(router_settings, config_dir=None, delimiter="|"):
     """Extracts connection settings and firmware details from csv.
        Logs errors if unexpected modulenames found in header.
 
-    Args:
-        router: row from CSV with settings for a single router
-        separator: character used to separate modules from fields (default '|')
-
-    Returns:
-        settings: dictionary of dictionaries containing extracted data from csv
-
+    :param router: row from CSV with settings for a single router
+    :param config_dir: path to configuration file for toolium
+    :param delimiter: character used to separate modules from fields (default '|')
+    :returns: dictionary of dictionaries containing extracted data from csv
     """
-    connection = DrayTekWebAdmin()
+    # TODO: Not working yet, check if this needs to be called earlier in this function on in prior function.
+    # Ensure it does get passed into the Draytek Library
+    if not config_dir:
+        LOGGER.debug("Config directory not specified. Attempt to use cwd \\ conf")
+        config_dir = Path(getcwd(), "conf")
+    if Path.exists(Path(config_dir)):
+        LOGGER.info(f"Setting configuration Directory to: {config_dir}")
+        config_dir = str(Path(config_dir))
+
+    connection = DrayTekWebAdmin(config_dir=config_dir)
     router_firmware = Firmware()
     invalid = False
     try:
         for key in router_settings.keys():
-            modulename, fieldname = key.split(sep=separator)
+            modulename, fieldname = key.split(sep=delimiter)
             modulename = modulename.lower()
             if modulename == type(connection).__name__.lower():
                 if hasattr(connection, fieldname):
@@ -174,12 +173,7 @@ def extract_settings(router_settings, separator="|"):
 def create_template_csv(output_file):
     """Create a template CSV with just the data headers
 
-    Args:
-        output_file: filename to save template as
-
-    Returns:
-        None
-
+    :param output_file: filename to save template as
     """
     LOGGER.info(f"Outputfile {output_file}")
     # Get connection properties to save to CSV useful for later scripted changes
@@ -203,17 +197,13 @@ def create_template_csv(output_file):
         csvfile.writeheader()
 
 
-def upgrade_router(router_data, headless, upgrade, debug=False):
+def upgrade_router(router_data, upgrade, config_dir, debug=False):
     """Upgrade router firmware, or preview potential upgrade
 
-    Args:
-        router_data: connection information from csv input file
-        headless: display of browser session when interacting with router
-        upgrade: Flag to allow upgrade to run, preview otherwise
-
-    Returns:
-        None
-
+    :param router_data: connection information from csv input file
+    :param upgrade: Flag to allow upgrade to run, preview otherwise
+    :param config_dir: path to configuration file for toolium
+    :param debug: write a debug files of the page source on exception
     """
     table_headers = [
         "Router",
@@ -232,7 +222,7 @@ def upgrade_router(router_data, headless, upgrade, debug=False):
         for router in router_data:
             upgrade_state = None
             session, router_firmware = check_upgrade_router(
-                router=router, headless=headless, debug=debug
+                router=router, config_dir=config_dir, debug=debug
             )
             if (session) and (router_firmware):  # Both values not None
                 if (router_firmware.router_firmware_upgradable()) or (
@@ -268,6 +258,7 @@ def upgrade_router(router_data, headless, upgrade, debug=False):
             print(tabulate(table, headers=table_headers))
         if upgrade_required_count > 0:
             print("\nUpgrades required! Re-run with --upgrade (or -u) argument")
+        session.close_session()
         session = None  # Clear session before next loop
     finally:
         if session is not None:
@@ -276,13 +267,6 @@ def upgrade_router(router_data, headless, upgrade, debug=False):
 
 def main():
     """Main. Called when program called directly from the command line.
-
-    Args:
-        None
-
-    Returns:
-        None
-
     """
     argv = None
     parser = _get_parser()
@@ -294,8 +278,8 @@ def main():
             datasource = read_csv(args.inputfile)
             upgrade_router(
                 router_data=datasource,
-                headless=args.headless,
                 upgrade=args.upgrade,
+                config_dir=args.config,
                 debug=args.debug,
             )
         else:
