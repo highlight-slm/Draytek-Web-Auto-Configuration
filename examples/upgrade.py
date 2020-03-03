@@ -141,6 +141,8 @@ def extract_settings(router_settings, config_dir=None, delimiter="|"):
     if Path.exists(Path(config_dir)):
         LOGGER.info(f"Setting configuration Directory to: {config_dir}")
         config_dir = str(Path(config_dir))
+    else:
+        config_dir = None
 
     connection = DrayTekWebAdmin(config_dir=config_dir)
     router_firmware = Firmware()
