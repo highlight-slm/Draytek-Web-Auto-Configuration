@@ -23,7 +23,9 @@ class BasePageObject(PageObject):
                 return element.is_selected()
             if type(element).__name__ == "Select":
                 return str(element.option)
-            raise TypeError(f"read_element_value: Unhandled element type: {type(element).__name__}")
+            raise TypeError(
+                f"read_element_value: Unhandled element type: {type(element).__name__}"
+            )
         return None
 
     @staticmethod
@@ -51,4 +53,6 @@ class BasePageObject(PageObject):
             if type(element).__name__ == "Select":
                 element.option = value
                 return
-            raise TypeError(f"write_element_value: Unhandled element type: {type(element).__name__}")
+            raise TypeError(
+                f"write_element_value: Unhandled element type: {type(element).__name__}"
+            )

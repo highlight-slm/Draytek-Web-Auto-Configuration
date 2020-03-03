@@ -16,7 +16,7 @@ PROJECT_CLASSIFIERS = [
 
 setup(
     name="draytekwebadmin",
-    version="0.1.0",
+    version="0.1.1",
     license="MIT",
     url="https://github.com/highlight-slm/Draytek-Web-Auto-Configuration",
     download_url="https://github.com/highlight-slm/Draytek-Web-Auto-Configuration",
