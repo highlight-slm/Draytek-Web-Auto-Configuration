@@ -134,7 +134,7 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
 
         webadmin_session = settings["connection"]
         # Not strictly needed, since configuring modules will trigger connect.
-        # But this way we can ensure we ensure we can connect ourside the for loop.
+        # But this way we can ensure we ensure we can connect outside the for loop.
         webadmin_session.start_session()
         for modulename in settings:
             LOGGER.debug(f"Processing modulename: {modulename}")

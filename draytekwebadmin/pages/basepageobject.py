@@ -22,7 +22,7 @@ class BasePageObject(PageObject):
             ):
                 return element.is_selected()
             if type(element).__name__ == "Select":
-                return element.option()
+                return str(element.option)
             raise TypeError(f"read_element_value: Unhandled element type: {type(element).__name__}")
         return None
 
