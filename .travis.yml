@@ -14,4 +14,4 @@ matrix:
 
 install: "pip3 install -U tox coveralls"
 script: tox
-after_success: coveralls --service=travis-pro
+after_success: coveralls
