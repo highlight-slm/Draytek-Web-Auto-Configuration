@@ -23,7 +23,7 @@ class BasePageObject(PageObject):
                 return element.is_selected()
             if type(element).__name__ == "Select":
                 return element.option()
-            raise TypeError(f"Unhandled element type: {type(element).__name__}")
+            raise TypeError(f"read_element_value: Unhandled element type: {type(element).__name__}")
         return None
 
     @staticmethod
@@ -37,14 +37,18 @@ class BasePageObject(PageObject):
             if type(element).__name__ == "InputText":
                 element.clear()
                 element.text = value
+                return
             if type(element).__name__ == "Checkbox":
                 if value:
                     element.check()
                 elif not None:
                     element.uncheck()
+                return
             if type(element).__name__ == "InputRadio":
                 if value:
                     element.check()
+                return
             if type(element).__name__ == "Select":
                 element.option = value
-            raise TypeError(f"Unhandled element type: {type(element).__name__}")
+                return
+            raise TypeError(f"write_element_value: Unhandled element type: {type(element).__name__}")
