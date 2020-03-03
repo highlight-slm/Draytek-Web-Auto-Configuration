@@ -41,9 +41,13 @@ The following devices and firmware versions have been tested. It is likely that 
 This utility uses Python with Selenium Web Driver (using toolium as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
 
 - Python 3.6 (or later)
-- Required libraries detailed in requirements.txt
+- Install driver for required web browser
+- Clone this repository
 
-To install requirements: `pip install -r requirements.txt`
+From within cloned directory:
+
+- Install requirements: `pip install --user -r requirements.txt`
+- Install this module: `pip install --user .`
 
 ### Supported Browsers
 
@@ -54,14 +58,54 @@ Depending on which Web Browser you have installed you will need the appropriate 
 
 ## Example Implementations
 
-### Read and Write Router Settings
+### Read Router Settings
 
-Configure multiple routers specified in a CSV file
+This example reads the configuration of router and outputs the settings to a CSV file.
+The supported command line arguments can be displayed by running: `python read_settings.py -h`
 
-Usage: TODO
+```text
+usage: read_settings.py [-h] -a ADDRESS [-u USER] -p PASSWORD [-o OUTPUT] [-d]
 
-Read settings from routers and save to CSV: `examples/read_settings.py`
-Write new settings to router: `examples/write_settings.py`
+Read DrayTek router settings. Saving the result to a CSV file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a ADDRESS, --address ADDRESS
+                        Router address e.g. https://192.168.0.1:8080
+  -u USER, --user USER  Router administrator user name (default: admin)
+  -p PASSWORD, --password PASSWORD
+                        Router administrator password
+  -o OUTPUT, --output OUTPUT
+                        Output data file (default: draytek-out.csv)
+  -d, --debug           Errors will attempt to capture Web page
+```
+
+### Write Router Settings
+
+This example configures multiple routers specified in a CSV file.
+The support command line arguments can be displayed by running: `python write_sesttings.py`
+
+Using the -t option a template CSV file will be generated.
+
+```text
+usage: write_settings.py [-h] [-t TEMPLATE] [-w] [--no-reboot] [-d]
+                         [inputfile]
+
+Write DrayTek router settings from a source CSV file.
+
+positional arguments:
+  inputfile             Input CSV. Each router and config should be on it's
+                        own row
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t TEMPLATE, --template TEMPLATE
+                        Generate blank template CSV e.g. -t template.csv
+  -w, --whatif          Show what changes would be made, does not make any
+                        change to current configuration
+  --no-reboot           Do not reboot routers after configuration change, even if required
+  -d, --debug           Errors will attempt to capture Web page
+```
 
 ### Upgrade Router Firmware
 
@@ -73,7 +117,24 @@ Usage:
  - Apply firmware updates: `upgrade.py -u upgrade.csv`
    - Example [upgrade.csv](https://raw.githubusercontent.com/highlight-slm/Draytek-Web-Auto-Configuration/master/examples/upgrade.csv)
 
-See: `examples/upgrade.py`
+```text
+usage: upgrade.py [-h] [-t TEMPLATE] [-u] [-d] [-c CONFIG] [inputfile]
+
+Upgrade Draytek Router firmware from a source CSV file
+
+positional arguments:
+  inputfile             Input CSV. Each router and config should be on it's
+                        own row
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t TEMPLATE, --template TEMPLATE
+                        Generate blank template CSV e.g. -t template.csv
+  -u, --upgrade         Perform firmware upgrade (inc reboot), preview only
+  -d, --debug           Errors will attempt to capture Web page
+  -c CONFIG, --config CONFIG
+                        Location of configuration file directory e.g. -c c:\upgrade\conf
+```
 
 ## Development & Unit Testing
 

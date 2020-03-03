@@ -50,7 +50,7 @@ def _get_parser():
         "--debug",
         action="store_true",
         default=False,
-        help="Run in debug mode, errors will attempt to capture Web Admin page",
+        help="Errors will attempt to capture Web page",
     )
     parser.add_argument(
         "-c",
