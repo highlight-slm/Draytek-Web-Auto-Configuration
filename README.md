@@ -142,6 +142,7 @@ If you are looking to contribute/extend this project. You will need to install a
 
 - For testing, linting and code coverage: `pip install -r requirements_test.txt`
 - For development, ensuring tests are run before committing code: `pip install -r requirements_dev.txt`
+- Setup git pre-commit hook: `pre-commit install`
 
 ## Contributors
 
