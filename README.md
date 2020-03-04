@@ -25,7 +25,7 @@ The following capabilities are currently implemented:
   - Performing an upgrade and rebooting
 - Router Reboot (immediately, using current configuration)
 
-Note full data models have been created for the SNMP and Management pages. Enabling anyone to contribute further to add the extra settings they need to configure.
+Note: Full data models have been created for the SNMP and Management pages. Enabling anyone to contribute further to add the extra settings they need to configure.
 
 ## Tested Devices
 
@@ -38,23 +38,18 @@ The following devices and firmware versions have been tested. It is likely that 
 
 ## Requirements
 
-This utility uses Python with Selenium Web Driver (using toolium as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
+This utility uses Python with Selenium Web Driver (using [toolium](https://github.com/Telefonica/toolium) as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
 
-- Python 3.6 (or later)
-- Install driver for required web browser
-- Clone this repository
+- [Python 3.6 (or later)](https://www.python.org/downloads/)
+- Install driver for required web browser. The path to the driver needs to be defined in `conf\properties.cfg`.
+  - Chrome - requires [ChromeDriver](http://chromedriver.chromium.org/)
+  - Firefox - requires [GeckoDriver](https://github.com/mozilla/geckodriver/releases)
+- Clone [this](https://github.com/highlight-slm/Draytek-Web-Auto-Configuration) repository
 
 From within cloned directory:
 
 - Install requirements: `pip install --user -r requirements.txt`
 - Install this module: `pip install --user .`
-
-### Supported Browsers
-
-Depending on which Web Browser you have installed you will need the appropriate driver. The path to the driver needs to be defined in `conf\properties.cfg`.
-
-- Chrome - requires [ChromeDriver](http://chromedriver.chromium.org/)
-- Firefox - requires [GeckoDriver](https://github.com/mozilla/geckodriver/releases)
 
 ## Example Implementations
 
@@ -88,14 +83,12 @@ The support command line arguments can be displayed by running: `python write_se
 Using the -t option a template CSV file will be generated.
 
 ```text
-usage: write_settings.py [-h] [-t TEMPLATE] [-w] [--no-reboot] [-d]
-                         [inputfile]
+usage: write_settings.py [-h] [-t TEMPLATE] [-w] [--no-reboot] [-d] [inputfile]
 
 Write DrayTek router settings from a source CSV file.
 
 positional arguments:
-  inputfile             Input CSV. Each router and config should be on it's
-                        own row
+  inputfile             Input CSV. Each router and config should be on it's own row
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -112,10 +105,11 @@ optional arguments:
 Apply firmware updates to multiple routers specified in a CSV file. File can contain multiple routers, models, versions.
 
 Usage:
- - Generate input file template: `upgrade.py -t upgrade-template.csv`
- - Preview upgrade: `upgrade.py upgrade.csv`
- - Apply firmware updates: `upgrade.py -u upgrade.csv`
-   - Example [upgrade.csv](https://raw.githubusercontent.com/highlight-slm/Draytek-Web-Auto-Configuration/master/examples/upgrade.csv)
+
+- Generate input file template: `upgrade.py -t upgrade-template.csv`
+- Preview upgrade: `upgrade.py upgrade.csv`
+- Apply firmware updates: `upgrade.py -u upgrade.csv`
+  - Example [upgrade.csv](https://raw.githubusercontent.com/highlight-slm/Draytek-Web-Auto-Configuration/master/examples/upgrade.csv)
 
 ```text
 usage: upgrade.py [-h] [-t TEMPLATE] [-u] [-d] [-c CONFIG] [inputfile]
@@ -123,8 +117,7 @@ usage: upgrade.py [-h] [-t TEMPLATE] [-u] [-d] [-c CONFIG] [inputfile]
 Upgrade Draytek Router firmware from a source CSV file
 
 positional arguments:
-  inputfile             Input CSV. Each router and config should be on it's
-                        own row
+  inputfile             Input CSV. Each router and config should be on it's own row
 
 optional arguments:
   -h, --help            show this help message and exit
