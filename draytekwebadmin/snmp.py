@@ -200,7 +200,7 @@ class SNMPIPv6(SNMPv1v2):
             "manager_host_prelen_2",
             "manager_host_prelen_3",
         ]:
-            if value in (0, "0"):
+            if value in (0, "0", ""):
                 value = None  # Zero is the default prefix when no address is set.
             if not valid_ipv6_prefix(value):
                 raise ValueError(f"Invalid IPv6 Prefix Length: {value}")

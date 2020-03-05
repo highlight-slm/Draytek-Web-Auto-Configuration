@@ -123,6 +123,7 @@ class TestSNMPIPv6(unittest.TestCase):
             ).manager_host_1,
         )
         self.assertEqual(1, SNMPIPv6(manager_host_prelen_1=1).manager_host_prelen_1)
+        self.assertEqual(None, SNMPIPv6(manager_host_prelen_1="").manager_host_prelen_1)
 
     def test_validation(self):
         with self.assertRaises(ValueError):
