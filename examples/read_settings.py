@@ -6,7 +6,15 @@ import logging
 import time
 from urllib.parse import urlparse
 
-from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
+from draytekwebadmin import (
+    DrayTekWebAdmin,
+    SNMPIPv4,
+    SNMPIPv6,
+    SNMPTrapIPv4,
+    SNMPTrapIPv6,
+    SNMPv3,
+    InternetAccessControl,
+)
 
 LOGGER = logging.getLogger("root")
 FORMAT = "[%(levelname)s] %(message)s"
@@ -100,6 +108,10 @@ def read_data(session):
 
     router_info = vars(session.routerinfo)  # Read router info
     snmp_ipv4 = vars(session.read_settings(SNMPIPv4))
+    snmp_ipv6 = vars(session.read_settings(SNMPIPv6))
+    snmp_trap_ipv4 = vars(session.read_settings(SNMPTrapIPv4))
+    snmp_trap_ipv6 = vars(session.read_settings(SNMPTrapIPv6))
+    snmpv3 = vars(session.read_settings(SNMPv3))
     internet_access = vars(session.read_settings(InternetAccessControl))
 
     # Rename the dictionary keys to include the object model name
@@ -107,10 +119,23 @@ def read_data(session):
     connection_info = prefixKeys(connection_info, DrayTekWebAdmin.__name__, sep)
     router_info = prefixKeys(router_info, session.routerinfo.__class__.__name__, sep)
     snmp_ipv4 = prefixKeys(snmp_ipv4, SNMPIPv4.__name__, sep)
+    snmp_ipv6 = prefixKeys(snmp_ipv6, SNMPIPv6.__name__, sep)
+    snmp_trap_ipv4 = prefixKeys(snmp_trap_ipv4, SNMPTrapIPv4.__name__, sep)
+    snmp_trap_ipv6 = prefixKeys(snmp_trap_ipv6, SNMPTrapIPv6.__name__, sep)
+    snmpv3 = prefixKeys(snmpv3, SNMPv3.__name__, sep)
     internet_access = prefixKeys(internet_access, InternetAccessControl.__name__, sep)
 
     # Merge the data sources into a single dictionary
-    data = {**connection_info, **router_info, **snmp_ipv4, **internet_access}
+    data = {
+        **connection_info,
+        **router_info,
+        **snmp_ipv4,
+        **snmp_ipv6,
+        **snmp_trap_ipv4,
+        **snmp_trap_ipv6,
+        **snmpv3,
+        **internet_access,
+    }
     return data
 
 

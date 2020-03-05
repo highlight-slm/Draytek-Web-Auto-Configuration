@@ -8,7 +8,15 @@ from urllib.parse import urlparse
 
 from tabulate import tabulate
 
-from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
+from draytekwebadmin import (
+    DrayTekWebAdmin,
+    SNMPIPv4,
+    SNMPIPv6,
+    SNMPTrapIPv4,
+    SNMPTrapIPv6,
+    SNMPv3,
+    InternetAccessControl,
+)
 
 LOGGER = logging.getLogger("root")
 FORMAT = "[%(levelname)s] %(message)s"
@@ -213,6 +221,10 @@ def extract_settings(router_settings, separator="|"):
     connection = DrayTekWebAdmin()
     info = {}
     snmpipv4 = SNMPIPv4()
+    snmpipv6 = SNMPIPv6()
+    snmp_trap_ipv4 = SNMPTrapIPv4()
+    snmp_trap_ipv6 = SNMPTrapIPv6()
+    snmpv3 = SNMPv3()
     iac = InternetAccessControl()
     invalid = False
     try:
@@ -231,6 +243,26 @@ def extract_settings(router_settings, separator="|"):
                     setattr(snmpipv4, fieldname, router_settings.get(key))
                 else:
                     invalid = True
+            elif modulename == type(snmpipv6).__name__.lower():
+                if hasattr(snmpipv6, fieldname):
+                    setattr(snmpipv6, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(snmp_trap_ipv4).__name__.lower():
+                if hasattr(snmp_trap_ipv4, fieldname):
+                    setattr(snmp_trap_ipv4, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(snmp_trap_ipv6).__name__.lower():
+                if hasattr(snmp_trap_ipv6, fieldname):
+                    setattr(snmp_trap_ipv6, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(snmpv3).__name__.lower():
+                if hasattr(snmpv3, fieldname):
+                    setattr(snmpv3, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
             elif modulename == type(iac).__name__.lower():
                 if hasattr(iac, fieldname):
                     setattr(iac, fieldname, router_settings.get(key))
@@ -245,6 +277,10 @@ def extract_settings(router_settings, separator="|"):
     settings["connection"] = connection
     settings["info"] = info
     settings["snmpipv4"] = snmpipv4
+    settings["snmpipv6"] = snmpipv6
+    settings["snmp_trap_ipv4"] = snmp_trap_ipv4
+    settings["snmp_trap_ipv6"] = snmp_trap_ipv6
+    settings["snmpv3"] = snmpv3
     settings["iac"] = iac
     return settings
 
