@@ -6,6 +6,8 @@ import logging
 import time
 from urllib.parse import urlparse
 
+from tabulate import tabulate
+
 from draytekwebadmin import DrayTekWebAdmin, SNMPIPv4, InternetAccessControl
 
 LOGGER = logging.getLogger("root")
@@ -112,9 +114,11 @@ def diff(current, new):
             differences.append(f"Unexpected keys: {different_keys}")
         for key in common_keys:
             if dict_current[key] != dict_new[key]:
-                differences.append(
-                    f"{key}: CURRENT = {dict_current[key]} | NEW = {dict_new[key]}"
-                )
+                # None is the same as False and an empty value, so exclude from differences as should be falsey
+                if (dict_current[key]) or (dict_new[key]):
+                    differences.append(
+                        f"{key}: CURRENT = {dict_current[key]} | NEW = {dict_new[key]}"
+                    )
     return differences
 
 
@@ -125,9 +129,12 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
     :param allow_reboot: reboot router if required after config change
     :param whatif: Compares settings does not write changes to router
     :param debug: write a debug files of the page source on exception
+    :return: webadmin_session
+    :return: Configuration status message
     """
     webadmin_session = None
     reboot_required = False
+    router_configure_status = ""
 
     try:
         settings = extract_settings(router)
@@ -143,29 +150,40 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
                 LOGGER.info(
                     f"Module: {modulename} of type {type(newsettings)} found. Applying settings"
                 )
-                if whatif:
-                    current = webadmin_session.read_settings(type(settings[modulename]))
-                    differences = diff(current, newsettings)
-                    for change in differences:
-                        print(
-                            f"[WhatIf] {webadmin_session.hostname} : {modulename} - {change}"
-                        )
+                current = webadmin_session.read_settings(type(settings[modulename]))
+                differences = diff(current, newsettings)
+                if len(differences) > 0:
+                    if whatif:
+                        for change in differences:
+                            router_configure_status = (
+                                "WhatIf Mode - Changes not applied"
+                            )
+                            print(
+                                f"[WhatIf] {webadmin_session.hostname} : {modulename} - {change}"
+                            )
+                    else:
+                        reboot_requested = webadmin_session.write_settings(newsettings)
+                        router_configure_status = "Updated"
+                        if reboot_requested:
+                            reboot_required = True
                 else:
-                    reboot_requested = webadmin_session.write_settings(newsettings)
-                    if reboot_requested:
-                        reboot_required = True
+                    router_configure_status = "No changes required"
         if reboot_required:
             LOGGER.info("Router Reboot required to apply configuration changes")
             if allow_reboot:
                 LOGGER.info(f"Rebooting Router: {webadmin_session.hostname}")
                 webadmin_session.reboot_router()
+                router_configure_status = "Updated & router restarted"
             else:
+                router_configure_status = "Updated. REBOOT REQUIRED"
                 print(
                     f"Reboot required to complete configuration of {webadmin_session.hostname}"
                 )
         else:
             print(f"Router: {webadmin_session.hostname} - Reconfiguration completed")
-        # TODO: Have a list of completed devices, and ones with pending reboots, report success or fail?
+
+        return webadmin_session, router_configure_status
+
     except Exception as exception:
         LOGGER.critical(exception)
         if webadmin_session is not None:
@@ -182,9 +200,7 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
                 )
                 debugfile.write(page_source)
                 debugfile.close()
-    finally:
-        if webadmin_session is not None:
-            webadmin_session.close_session()
+        return webadmin_session, router_configure_status
 
 
 def extract_settings(router_settings, separator="|"):
@@ -241,10 +257,69 @@ def create_template_csv(output_file):
     raise NotImplementedError
 
 
+def result_row_builder(session, status, router_name=None):
+    """Generate data for results table
+        :param session: Draytekwebadmin session object
+        :param status: Status from perfoming write operations
+        :param router_name: (optional): Router name from source CSV file, for if connection fails
+        :return: row list of fields
+    """
+    row = [""]
+    if (session) and (len(status) > 0):
+        row = [
+            session.hostname,
+            session.routerinfo.model,
+            session.routerinfo.router_name,
+            status,
+        ]
+    elif session:
+        if session.routerinfo:
+            row = [
+                session.hostname,
+                session.routerinfo.model,
+                session.routerinfo.router_name,
+                "ERROR in WebSession",
+            ]
+        else:
+            row = [session.hostname, "", "", "ERROR - Unable to Login"]
+    elif (router_name) and (len(status) > 0):
+        row = [router_name, "", "", status]
+    elif len(status) > 0:
+        row = ["Unknown", "", "", status]
+    elif router_name:
+        row = [router_name, "", "", "ERROR!"]
+    else:
+        row = ["Unknown", "", "", "ERROR!"]
+    return row
+
+
+class results_table:
+    """Results Table."""
+
+    def __init__(self, headers):
+        """Create a table for showing results."""
+
+        self._table = [""]
+        self.headers = headers
+
+    def add_row(self, row):
+        """Add a row to the results table.
+
+        :param row: list of result fields
+        """
+        self._table.append(row)
+
+    def print(self):
+        """Print the results table with headers."""
+        print(tabulate(self._table, headers=self.headers, showindex=True))
+
+
 def main():
     """Main. Called when program called directly from the command line.
 
     """
+    results = results_table(headers=["Index", "Router", "Model", "Name", "Status"])
+    session = None
     argv = None
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -253,16 +328,27 @@ def main():
     elif args.inputfile:
         try:
             datasource = read_csv(args.inputfile)
+
             # For each row attempt to configure router
             for router in datasource:
-                configure_router(
+                (session, status) = configure_router(
                     router=router,
                     allow_reboot=args.reboot,
                     whatif=args.whatif,
                     debug=args.debug,
                 )
+                results.add_row(result_row_builder(session, status))
+                results.print()
+                session.close_session()
         except FileNotFoundError:
             LOGGER.critical(f"Input file not found: {args.inputfile}")
+        except Exception as e:
+            if session:
+                results.add_row(result_row_builder(session, status, router))
+            LOGGER.critical(f"Error: {e}")
+        finally:
+            if session is not None:
+                session.close_session()
     else:
         parser.print_help()
 

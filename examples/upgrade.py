@@ -9,7 +9,6 @@ from pathlib import Path
 
 from tabulate import tabulate
 
-
 from draytekwebadmin import DrayTekWebAdmin, Firmware
 
 LOGGER = logging.getLogger("root")
@@ -92,6 +91,7 @@ def check_upgrade_router(router, config_dir=None, debug=False):
     :returns: DraytekWebAdmin Firmware object
     """
     webadmin_session = None
+    preview = None
 
     try:
         settings = extract_settings(router, config_dir)
@@ -120,7 +120,7 @@ def check_upgrade_router(router, config_dir=None, debug=False):
                 debugfile.close()
             else:
                 webadmin_session.close_session()
-            return webadmin_session, None
+            return webadmin_session, preview
         return None, None
 
 
@@ -199,77 +199,122 @@ def create_template_csv(output_file):
         csvfile.writeheader()
 
 
-def upgrade_router(router_data, upgrade, config_dir, debug=False):
+def upgrade_router(router, upgrade, config_dir, debug=False):
     """Upgrade router firmware, or preview potential upgrade
 
-    :param router_data: connection information from csv input file
+    :param router: connection information from csv input file
     :param upgrade: Flag to allow upgrade to run, preview otherwise
     :param config_dir: path to configuration file for toolium
     :param debug: write a debug files of the page source on exception
+    :return: webadmin_session
+    :return: router firmware object
+    :return: Upgrade status message
+    :return: Upgrade required boolean
     """
-    table_headers = [
-        "Router",
-        "Model",
-        "Name",
-        "Current Firmware",
-        "Current Modem Firmware",
-        "Target Firmware",
-        "Target Modem Firmware",
-        "Upgrade",
-    ]
-    table = [""]
-    upgrade_required_count = 0
+
     session = None
+    router_firmware = None
+    upgrade_status_message = None
+    upgrade_required = False
     try:
-        for router in router_data:
-            upgrade_state = None
-            session, router_firmware = check_upgrade_router(
-                router=router, config_dir=config_dir, debug=debug
-            )
-            if (session) and (router_firmware):  # Both values not None
-                if (router_firmware.router_firmware_upgradable()) or (
-                    router_firmware.modem_firmware_upgradable()
-                ):
-                    if upgrade:
-                        upgrade_state = "UPGRADED!"
-                        LOGGER.info(f"Router {session.hostname} - Upgrading Router")
-                        session.upgrade(router_firmware)
-                    else:
-                        upgrade_required_count += 1
-                        upgrade_state = "REQUIRED"
+        (session, router_firmware) = check_upgrade_router(
+            router=router, config_dir=config_dir, debug=debug
+        )
+        if (session) and (router_firmware):  # Both values not None
+            if (router_firmware.router_firmware_upgradable()) or (
+                router_firmware.modem_firmware_upgradable()
+            ):
+                if upgrade:
+                    upgrade_status_message = "UPGRADED!"
+                    LOGGER.info(f"Router {session.hostname} - Upgrading Router")
+                    session.upgrade(router_firmware)
                 else:
-                    upgrade_state = "N/A"
-                    LOGGER.info(f"Router {session.hostname} - Firmware up-to-date")
-                row = [
-                    session.hostname,
-                    session.routerinfo.model,
-                    session.routerinfo.router_name,
-                    router_firmware.firmware_current,
-                    router_firmware.modem_firmware_current.split()[0],
-                    router_firmware.firmware_target,
-                    router_firmware.modem_firmware_target.split()[0],
-                    upgrade_state,
-                ]
+                    upgrade_required = True
+                    upgrade_status_message = "Upgrade Required"
             else:
-                upgrade_state = "ERROR!"
-                LOGGER.info(
-                    f"Router {session.hostname} - Unable to access Firmware information"
-                )
-                row = [session.hostname, "", "", "", "", "", "", upgrade_state]
-            table.append(row)
-            print(tabulate(table, headers=table_headers))
-        if upgrade_required_count > 0:
-            print("\nUpgrades required! Re-run with --upgrade (or -u) argument")
-        session.close_session()
-        session = None  # Clear session before next loop
+                upgrade_status_message = "N/A"
+                LOGGER.info(f"Router {session.hostname} - Firmware up-to-date")
+        else:
+            upgrade_status_message = "ERROR: Unable to access Firmware information"
+            LOGGER.info(
+                f"Router {session.hostname} - Unable to access Firmware information"
+            )
+        return session, router_firmware, upgrade_status_message, upgrade_required
     finally:
-        if session is not None:
-            session.close_session()
+        return session, router_firmware, upgrade_status_message, upgrade_required
+
+
+def result_row_builder(session, status, firmware=None, router_name=None):
+    """Generate data for results table
+
+        :param session: Draytekwebadmin session object
+        :param status: Status from perfoming write operations
+        :param firmware: Draytekwebadmin firmware object
+        :param router_name: (optional): Router name from source CSV file, for if connection fails
+        :return: row list of fields
+    """
+    row = [""]
+    if (session) and (firmware) and (len(status) > 0):
+        row = [
+            session.hostname,
+            session.routerinfo.model,
+            session.routerinfo.router_name,
+            firmware.firmware_current,
+            firmware.modem_firmware_current.split()[0],
+            firmware.firmware_target,
+            firmware.modem_firmware_target.split()[0],
+            status,
+        ]
+    elif (session) and (len(status) > 0):
+        row = [session.hostname, "", "", "", "", "", "", status]
+    elif session:
+        row = [session.hostname, "", "", "", "", "", "", "ERROR!"]
+    elif router_name:
+        row = [router_name, "", "", "", "", "", "", "ERROR!"]
+    else:
+        row = ["Unknown", "", "", "", "", "", "", "ERROR!"]
+    return row
+
+
+class results_table:
+    """Results Table."""
+
+    def __init__(self, headers):
+        """Create a table for showing results."""
+
+        self._table = [""]
+        self.headers = headers
+
+    def add_row(self, row):
+        """Add a row to the results table.
+
+        :param row: list of result fields
+        """
+        self._table.append(row)
+
+    def print(self):
+        """Print the results table with headers."""
+        print(tabulate(self._table, headers=self.headers, showindex=True))
 
 
 def main():
     """Main. Called when program called directly from the command line.
     """
+    results = results_table(
+        headers=[
+            "Index",
+            "Router",
+            "Model",
+            "Name",
+            "Current Firmware",
+            "Current Modem Firmware",
+            "Target Firmware",
+            "Target Modem Firmware",
+            "Status",
+        ]
+    )
+    upgrade_pending_count = 0
+    session = None
     argv = None
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -278,16 +323,32 @@ def main():
             create_template_csv(args.template)
         elif args.inputfile:
             datasource = read_csv(args.inputfile)
-            upgrade_router(
-                router_data=datasource,
-                upgrade=args.upgrade,
-                config_dir=args.config,
-                debug=args.debug,
-            )
+            for router in datasource:
+                (session, firmware, status, upgrade_required) = upgrade_router(
+                    router=router,
+                    upgrade=args.upgrade,
+                    config_dir=args.config,
+                    debug=args.debug,
+                )
+                if upgrade_required:
+                    upgrade_pending_count += 1
+
+                results.add_row(result_row_builder(session, status, firmware))
+                results.print()
+                session.close_session()
+            if upgrade_pending_count > 0:
+                print("\nUpgrades required! Re-run with --upgrade (or -u) argument")
+
         else:
             parser.print_help()
     except OSError as os_err:
         LOGGER.critical(f"OSError: {os_err}")
+    except Exception as e:
+        if session:
+            results.add_row(
+                result_row_builder(session=session, status=status, router_name=router)
+            )
+        LOGGER.critical(f"Error: {e}")
 
 
 if __name__ == "__main__":
