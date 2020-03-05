@@ -38,7 +38,7 @@ class LoginPage(BasePageObject):
         :returns: Error message string
         """
         if self.login_error_message.is_visible():
-            message = self.read_element_value(self.login_error_message.web_element)
+            message = self.read_element_value(self.login_error_message)
         else:
             message = "No Error message returned - Login Failed"
         return message
