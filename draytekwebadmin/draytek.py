@@ -74,8 +74,7 @@ class DrayTekWebAdmin:
     def session(self):
         """Return toolium session instance, creating if needed.
 
-        :returns: TODO!
-        :rtype: TODO!
+        :returns: toolium session
         """
         if self._session is None:
             try:
