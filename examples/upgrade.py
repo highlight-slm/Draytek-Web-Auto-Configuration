@@ -133,8 +133,6 @@ def extract_settings(router_settings, config_dir=None, delimiter="|"):
     :param delimiter: character used to separate modules from fields (default '|')
     :returns: dictionary of dictionaries containing extracted data from csv
     """
-    # TODO: Not working yet, check if this needs to be called earlier in this function on in prior function.
-    # Ensure it does get passed into the Draytek Library
     if not config_dir:
         LOGGER.debug("Config directory not specified. Attempt to use cwd \\ conf")
         config_dir = Path(getcwd(), "conf")
