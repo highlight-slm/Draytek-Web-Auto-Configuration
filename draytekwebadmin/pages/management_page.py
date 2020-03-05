@@ -163,16 +163,11 @@ class ManagementPage(BasePageObject):
         :param settings: Management object
         """
         self.open_page()
-        if settings.router_name is not None:
-            self.set_element_value(self.router_name, settings.router_name)
-        if settings.disable_auto_logout is not None:
-            self.set_element_value(
-                self.disable_auto_logout, settings.disable_auto_logout
-            )
-        if settings.enable_validation_code is not None:
-            self.set_element_value(
-                self.enable_validation_code, settings.enable_validation_code
-            )
+        self.set_element_value(self.router_name, settings.router_name)
+        self.set_element_value(self.disable_auto_logout, settings.disable_auto_logout)
+        self.set_element_value(
+            self.enable_validation_code, settings.enable_validation_code
+        )
         self.ok_button.click()
         return self.check_reboot()
 
@@ -204,36 +199,21 @@ class ManagementPage(BasePageObject):
         :param settings: InternetAccessControl object
         """
         self.open_page()
-        if settings.internet_management is not None:
-            self.set_element_value(
-                self.enable_internet_access, settings.internet_management
-            )
-        if settings.domain_name_allowed is not None:
-            self.set_element_value(
-                self.domain_name_allowed, settings.domain_name_allowed
-            )
-        if settings.ftp_server is not None:
-            self.set_element_value(self.ftp, settings.ftp_server)
-        if settings.http_server is not None:
-            self.set_element_value(self.http, settings.http_server)
-        if settings.enforce_https_access is not None:
-            self.set_element_value(
-                self.enforce_https_access, settings.enforce_https_access
-            )
-        if settings.https_server is not None:
-            self.set_element_value(self.https, settings.https_server)
-        if settings.telnet_server is not None:
-            self.set_element_value(self.telnet, settings.telnet_server)
-        if settings.tr069_server is not None:
-            self.set_element_value(self.tr069, settings.tr069_server)
-        if settings.ssh_server is not None:
-            self.set_element_value(self.ssh, settings.ssh_server)
-        if settings.snmp_server is not None:
-            self.set_element_value(self.snmp, settings.snmp_server)
-        if settings.disable_ping_from_internet is not None:
-            self.set_element_value(
-                self.disable_ping_from_internet, settings.disable_ping_from_internet
-            )
+        self.set_element_value(
+            self.enable_internet_access, settings.internet_management
+        )
+        self.set_element_value(self.domain_name_allowed, settings.domain_name_allowed)
+        self.set_element_value(self.ftp, settings.ftp_server)
+        self.set_element_value(self.http, settings.http_server)
+        self.set_element_value(self.enforce_https_access, settings.enforce_https_access)
+        self.set_element_value(self.https, settings.https_server)
+        self.set_element_value(self.telnet, settings.telnet_server)
+        self.set_element_value(self.tr069, settings.tr069_server)
+        self.set_element_value(self.ssh, settings.ssh_server)
+        self.set_element_value(self.snmp, settings.snmp_server)
+        self.set_element_value(
+            self.disable_ping_from_internet, settings.disable_ping_from_internet
+        )
         self.ok_button.click()
         return self.check_reboot()
 
@@ -242,16 +222,39 @@ class ManagementPage(BasePageObject):
 
         :returns: AccessList object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return AccessList(
+            list_1_ip_object_index=self.read_element_value(self.access_index_1),
+            list_2_ip_object_index=self.read_element_value(self.access_index_2),
+            list_3_ip_object_index=self.read_element_value(self.access_index_3),
+            list_4_ip_object_index=self.read_element_value(self.access_index_4),
+            list_5_ip_object_index=self.read_element_value(self.access_index_5),
+            list_6_ip_object_index=self.read_element_value(self.access_index_6),
+            list_7_ip_object_index=self.read_element_value(self.access_index_7),
+            list_8_ip_object_index=self.read_element_value(self.access_index_8),
+            list_9_ip_object_index=self.read_element_value(self.access_index_9),
+            list_10_ip_object_index=self.read_element_value(self.access_index_10),
+        )
 
     def write_access_list_settings(self, settings: AccessList):
         """Populate the AccessList setting.
 
         :param settings: AccessList object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+
+        self.set_element_value(self.access_index_1, settings.list_1_ip_object_index)
+        self.set_element_value(self.access_index_2, settings.list_2_ip_object_index)
+        self.set_element_value(self.access_index_3, settings.list_3_ip_object_index)
+        self.set_element_value(self.access_index_4, settings.list_4_ip_object_index)
+        self.set_element_value(self.access_index_5, settings.list_5_ip_object_index)
+        self.set_element_value(self.access_index_6, settings.list_6_ip_object_index)
+        self.set_element_value(self.access_index_7, settings.list_7_ip_object_index)
+        self.set_element_value(self.access_index_8, settings.list_8_ip_object_index)
+        self.set_element_value(self.access_index_9, settings.list_9_ip_object_index)
+        self.set_element_value(self.access_index_10, settings.list_10_ip_object_index)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_management_port_settings(self):
         """Return the current ManagementPort settings.

@@ -31,25 +31,15 @@ class FirmwareUpgradePage(BasePageObject):
     preview_current_modem_version = Text(By.ID, "snewmdmver")
 
     def open_page(self):
-        """Navigate menus to open Firmware Upgrade page.
-
-        Args: None
-
-        Returns: None
-
-        """
+        """Navigate menus to open Firmware Upgrade page."""
         menu = MenuNavigator(self.driver_wrapper)
         menu.open_sysmain_firmware_upgrade()
 
     def new_firmware_preview(self, file: Firmware):
         """Preview firmware upgrade information for supplied firmware file.
 
-        Args:
-            file: Full file name and path to router firmware
-
-        Returns:
-            Firmware object: Firmware object populated with settings retrieved from previewing the firmware
-
+        :param file: Full file name and path to router firmware
+        :eturns Firmware object - Firmware object populated with settings retrieved from previewing the firmware
         """
         if file.filepath is None:
             raise ValueError("Firmware Preview requires a path to the a firmware file")
@@ -76,12 +66,8 @@ class FirmwareUpgradePage(BasePageObject):
     def new_firmware_install(self, file: Firmware):
         """Install firmware using the file specified.
 
-        Args:
-            file: Full file name and path to router firmware
-
-        Returns:
-            success: True if upgrade successful
-
+        :param file: Full file name and path to router firmware
+        :returns success - True if upgrade successful
         """
         self.open_page()
         self.choose_firmware_button.web_element.send_keys(str(file.filepath))
