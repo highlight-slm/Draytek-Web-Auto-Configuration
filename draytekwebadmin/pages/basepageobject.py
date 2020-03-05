@@ -34,25 +34,27 @@ class BasePageObject(PageObject):
 
         :param element: Web Element
         :param value: Value to be set against element
+        :return: true if setting applied
         """
         if element.web_element.is_enabled():
             if type(element).__name__ == "InputText":
                 element.clear()
                 element.text = value
-                return
+                return True
             if type(element).__name__ == "Checkbox":
                 if value:
                     element.check()
                 elif not None:
                     element.uncheck()
-                return
+                return True
             if type(element).__name__ == "InputRadio":
                 if value:
                     element.check()
-                return
+                return True
             if type(element).__name__ == "Select":
                 element.option = value
-                return
+                return True
             raise TypeError(
                 f"write_element_value: Unhandled element type: {type(element).__name__}"
             )
+        return False

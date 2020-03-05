@@ -26,9 +26,9 @@ class SNMPpage(BasePageObject):
     manager_host_v6_index_1 = InputText(By.NAME, "SNMPMngHostIP_V60")
     manager_host_v6_index_2 = InputText(By.NAME, "SNMPMngHostIP_V61")
     manager_host_v6_index_3 = InputText(By.NAME, "SNMPMngHostIP_V62")
-    manager_host_v6_prelen_index_1 = Select(By.NAME, "SNMPMngHostPreLen_V60")
-    manager_host_v6_prelen_index_2 = Select(By.NAME, "SNMPMngHostPreLen_V61")
-    manager_host_v6_prelen_index_3 = Select(By.NAME, "SNMPMngHostPreLen_V62")
+    manager_host_v6_prelen_index_1 = InputText(By.NAME, "SNMPMngHostPreLen_V60")
+    manager_host_v6_prelen_index_2 = InputText(By.NAME, "SNMPMngHostPreLen_V61")
+    manager_host_v6_prelen_index_3 = InputText(By.NAME, "SNMPMngHostPreLen_V62")
 
     trap_community = InputText(By.NAME, "SNMPTrapCom")
     trap_timeout = InputText(By.NAME, "SNMPTrapTimeOut")
@@ -91,7 +91,6 @@ class SNMPpage(BasePageObject):
         :returns reboot required (bool) - Indicating if settings change requires a reboot
         """
         self.open_page()
-        # TODO (#4424): If agent isn't enabled you can't set any of the sub-settings. Warn?
         if settings.enable_agent is not None:
             self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
         if settings.get_community is not None:
@@ -130,8 +129,24 @@ class SNMPpage(BasePageObject):
 
         :returns SNMPIPv6 object
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        return SNMPIPv6(
+            enable_agent=self.read_element_value(self.snmp_agent_enable),
+            get_community=self.read_element_value(self.get_community),
+            set_community=self.read_element_value(self.set_community),
+            manager_host_1=self.read_element_value(self.manager_host_v6_index_1),
+            manager_host_prelen_1=self.read_element_value(
+                self.manager_host_v6_prelen_index_1
+            ),
+            manager_host_2=self.read_element_value(self.manager_host_v6_index_2),
+            manager_host_prelen_2=self.read_element_value(
+                self.manager_host_v6_prelen_index_2
+            ),
+            manager_host_3=self.read_element_value(self.manager_host_v6_index_3),
+            manager_host_prelen_3=self.read_element_value(
+                self.manager_host_v6_prelen_index_3
+            ),
+        )
 
     def write_snmp_ipv6_settings(self, settings: SNMPIPv6):
         """Populate the SNMPIPv6 settings.
@@ -139,16 +154,52 @@ class SNMPpage(BasePageObject):
         :param settings: SNMPIPv6 object
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        if settings.enable_agent is not None:
+            self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
+        if settings.get_community is not None:
+            self.set_element_value(self.get_community, settings.get_community)
+        if settings.set_community is not None:
+            self.set_element_value(self.set_community, settings.set_community)
+        if settings.manager_host_1 is not None:
+            self.set_element_value(
+                self.manager_host_v6_index_1, settings.manager_host_1
+            )
+        if settings.manager_host_2 is not None:
+            self.set_element_value(
+                self.manager_host_v6_index_2, settings.manager_host_2
+            )
+        if settings.manager_host_3 is not None:
+            self.set_element_value(
+                self.manager_host_v6_index_3, settings.manager_host_3
+            )
+        if settings.manager_host_prelen_1 is not None:
+            self.set_element_value(
+                self.manager_host_v6_prelen_index_1, settings.manager_host_prelen_1
+            )
+        if settings.manager_host_prelen_2 is not None:
+            self.set_element_value(
+                self.manager_host_v6_prelen_index_2, settings.manager_host_prelen_2
+            )
+        if settings.manager_host_prelen_3 is not None:
+            self.set_element_value(
+                self.manager_host_v6_prelen_index_3, settings.manager_host_prelen_3
+            )
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_snmp_ipv4_trap_setting(self):
         """Return the current SNMPIPv4 Trap settings.
 
         :returns: SNMPIPv4Trap object
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        return SNMPTrapIPv4(
+            community=self.read_element_value(self.trap_community),
+            timeout=self.read_element_value(self.trap_timeout),
+            host_1=self.read_element_value(self.trap_host_v4_index_1),
+            host_2=self.read_element_value(self.trap_host_v4_index_2),
+        )
 
     def write_snmp_ipv4_trap_settings(self, settings: SNMPTrapIPv4):
         """Populate the SNMPIPv4 Trap settings.
@@ -156,16 +207,30 @@ class SNMPpage(BasePageObject):
         :param settings: SNMPIPv4Trap object
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        if settings.community is not None:
+            self.set_element_value(self.trap_community, settings.community)
+        if settings.timeout is not None:
+            self.set_element_value(self.trap_timeout, settings.timeout)
+        if settings.host_1 is not None:
+            self.set_element_value(self.trap_host_v4_index_1, settings.host_1)
+        if settings.host_2 is not None:
+            self.set_element_value(self.trap_host_v4_index_2, settings.host_2)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_snmp_ipv6_trap_setting(self):
         """Return the current SNMPIPv6 Trap settings.
 
         :returns: SNMPIPv6Trap object
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        return SNMPTrapIPv6(
+            community=self.read_element_value(self.trap_community),
+            timeout=self.read_element_value(self.trap_timeout),
+            host_1=self.read_element_value(self.trap_host_v6_index_1),
+            host_2=self.read_element_value(self.trap_host_v6_index_2),
+        )
 
     def write_snmp_ipv6_trap_settings(self, settings: SNMPTrapIPv6):
         """Populate the SNMPIPv6 Trap settings.
@@ -173,18 +238,34 @@ class SNMPpage(BasePageObject):
         :param settings: SNMPIPv6Trap object
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        if settings.community is not None:
+            self.set_element_value(self.trap_community, settings.community)
+        if settings.timeout is not None:
+            self.set_element_value(self.trap_timeout, settings.timeout)
+        if settings.host_1 is not None:
+            self.set_element_value(self.trap_host_v6_index_1, settings.host_1)
+        if settings.host_2 is not None:
+            self.set_element_value(self.trap_host_v6_index_2, settings.host_2)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_snmp_v3_settings(self):
         """Return the current SNMPv3 settings.
 
         :returns: SNMPv3 object
         """
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        return SNMPv3(
+            enable_v3_agent=self.read_element_value(self.snmpv3_agent_enable),
+            usm_user=self.read_element_value(self.snmpv3_usm_user),
+            auth_algorithm=self.read_element_value(self.snmpv3_auth_algo),
+            auth_password=self.read_element_value(self.snmpv3_auth_password),
+            priv_algorithm=self.read_element_value(self.snmpv3_priv_algo),
+            priv_password=self.read_element_value(self.snmpv3_priv_password),
+        )
 
-    def write_snmp_v3_settings(self, setting: SNMPv3):
+    def write_snmp_v3_settings(self, settings: SNMPv3):
         """Populate the SNMPv3 settings.
 
         :param settings: SNMPv3 object
@@ -192,5 +273,24 @@ class SNMPpage(BasePageObject):
         """
         # Note: To enable SNMPv3 agent, you also have to enable the SNMPv1v2 agent.
         # Which also needs v1v2 community strings, manager hosts etc.
-        # TODO (#4425): Implement
-        raise NotImplementedError
+        self.open_page()
+        if settings.enable_v3_agent is not None:
+            if not self.set_element_value(
+                self.snmpv3_agent_enable, settings.enable_v3_agent
+            ):
+                # Unable to enable V3 - Likely SNMP Agent for v1/v2 not enabled
+                raise ValueError(
+                    f"Can't enable SNMPv3 Agent. Draytek requires v2 to be enabled and configured to use SNMPv3."
+                )
+        if settings.usm_user is not None:
+            self.set_element_value(self.snmpv3_usm_user, settings.usm_user)
+        if settings.auth_algorithm is not None:
+            self.set_element_value(self.snmpv3_auth_algo, settings.auth_algorithm)
+        if settings.auth_password is not None:
+            self.set_element_value(self.snmpv3_auth_password, settings.auth_password)
+        if settings.priv_algorithm is not None:
+            self.set_element_value(self.snmpv3_priv_algo, settings.priv_algorithm)
+        if settings.priv_password is not None:
+            self.set_element_value(self.snmpv3_priv_password, settings.priv_password)
+        self.ok_button.click()
+        return self.check_reboot()

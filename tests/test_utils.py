@@ -84,6 +84,8 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(valid_ipv6_prefix("128"))
 
         self.assertFalse(valid_ipv6_prefix(0))
+        self.assertFalse(valid_ipv6_prefix("0"))
+        self.assertFalse(valid_ipv6_prefix(-1))
         self.assertFalse(valid_ipv6_prefix(129))
 
         with self.assertRaises(ValueError):

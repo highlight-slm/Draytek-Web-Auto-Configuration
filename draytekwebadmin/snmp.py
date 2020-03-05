@@ -67,6 +67,11 @@ class SNMPv3(SNMP):
         self.priv_password = priv_password
 
     def __setattr__(self, name, value):
+        if name in ("auth_password", "priv_password"):
+            if value is not None:
+                if len(set(value)) == 1:  # All the same character
+                    # Don't store. If all the same character. Likely all * as password field
+                    value = None
         if name == "auth_algorithm":
             if value is not None and value not in SNMPV3_AUTH_ALGO:
                 raise ValueError(
@@ -195,6 +200,8 @@ class SNMPIPv6(SNMPv1v2):
             "manager_host_prelen_2",
             "manager_host_prelen_3",
         ]:
+            if value in (0, "0"):
+                value = None  # Zero is the default prefix when no address is set.
             if not valid_ipv6_prefix(value):
                 raise ValueError(f"Invalid IPv6 Prefix Length: {value}")
         super(SNMPIPv6, self).__setattr__(name, value)

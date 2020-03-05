@@ -15,10 +15,14 @@ The following capabilities are currently implemented:
   - Enabling/Disabling remote management via the WAN interface
   - Restricting remote access to a defined domain name
   - Enabling/Disabling specific protocols are exposed via the WAN
-- Reading and writing SNMPv2 settings (_System Maintenance >> SNMP_)
+- Reading and writing SNMP settings (_System Maintenance >> SNMP_)
   - Enabling SNMP Agent
-  - Setting the Community strings
-  - Setting the allowed Management Host IPs (IPv4)
+  - SNMPv2 community strings
+  - Allowed Management Host IPs (IPv4 & IPv6)
+  - SNMP trap community
+  - SNMP trap hosts (IPv4 and IPv6)
+  - SNMP trap timeout
+  - SNMPv3 settings (Note: Draytek required SNMPv2 to be enabled and configured to use SNMPv3)
 - Router firmware upgrade (_System Maintenance >> Firmware Upgrade_)
   - Uploading a firmware file
   - Previewing the file to determine if an upgrade is needed

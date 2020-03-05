@@ -157,8 +157,22 @@ class DrayTekWebAdmin:
             return SNMPpage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_snmp_ipv4_settings()
-        # if name == "SNMPIPv6":
-        #     return SNMPpage(driver_wrapper=self.session.driver_wrapper).read_SNMPIPv6_settings()
+        if name == "SNMPIPv6":
+            return SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_snmp_ipv6_settings()
+        if name == "SNMPTrapIPv4":
+            return SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_snmp_ipv4_trap_setting()
+        if name == "SNMPTrapIPv6":
+            return SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_snmp_ipv6_trap_setting()
+        if name == "SNMPv3":
+            return SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_snmp_v3_settings()
         if name == "InternetAccessControl":
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
@@ -181,8 +195,22 @@ class DrayTekWebAdmin:
             reboot_req = SNMPpage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_snmp_ipv4_settings(settings)
-        # elif name == "SNMPIPv6":
-        #     reboot_req = SNMPpage(driver_wrapper=self.session.driver_wrapper).write_SNMPIPv6_settings(settings)
+        elif name == "SNMPIPv6":
+            reboot_req = SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_snmp_ipv6_settings(settings)
+        elif name == "SNMPTrapIPv4":
+            reboot_req = SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_snmp_ipv4_trap_settings(settings)
+        elif name == "SNMPTrapIPv6":
+            reboot_req = SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_snmp_ipv6_trap_settings(settings)
+        elif name == "SNMPv3":
+            reboot_req = SNMPpage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_snmp_v3_settings(settings)
         elif name == "InternetAccessControl":
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
