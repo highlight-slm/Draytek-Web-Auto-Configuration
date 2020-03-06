@@ -176,6 +176,10 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_internet_access_control_settings()
+        if name == "AccessList":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_access_list_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -214,6 +218,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_internet_access_control_settings(settings)
+        elif name == "AccessList":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_access_list_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 
