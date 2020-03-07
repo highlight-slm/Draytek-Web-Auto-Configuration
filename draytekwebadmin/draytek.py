@@ -188,6 +188,10 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_management_port_settings()
+        if name == "BruteForceProtection":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_brute_force_protection_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -238,6 +242,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_management_port_settings(settings)
+        elif name == "BruteForceProtection":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_brute_force_protection_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 

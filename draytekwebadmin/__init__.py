@@ -7,6 +7,7 @@ from draytekwebadmin.management import (
     InternetAccessControl,
     AccessList,
     ManagementPort,
+    BruteForceProtection,
 )
 from draytekwebadmin.firmware import Firmware
 
@@ -21,5 +22,6 @@ __all__ = [
     "InternetAccessControl",
     "AccessList",
     "ManagementPort",
+    "BruteForceProtection",
     "Firmware",
 ]

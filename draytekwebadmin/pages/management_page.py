@@ -71,7 +71,7 @@ class ManagementPage(BasePageObject):
     ssh_port = InputText(By.NAME, "txtSshPort")
 
     # Bruce Force Protection
-    enable_brute_force_login_protection = Checkbox(By.NAME, "iBrEn")
+    bf_enable = Checkbox(By.NAME, "iBrEn")
     bf_ftp = Checkbox(By.NAME, "iBrFtp")
     bf_http = Checkbox(By.NAME, "iBrHttp")
     bf_https = Checkbox(By.NAME, "iBrHttps")
@@ -297,16 +297,36 @@ class ManagementPage(BasePageObject):
 
         :returns: BruteForceProtection object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return BruteForceProtection(
+            enable=self.read_element_value(self.bf_enable),
+            ftp_server=self.read_element_value(self.bf_ftp),
+            http_server=self.read_element_value(self.bf_http),
+            https_server=self.read_element_value(self.bf_https),
+            telnet_server=self.read_element_value(self.bf_telnet),
+            tr069_server=self.read_element_value(self.bf_tr069),
+            ssh_server=self.read_element_value(self.bf_ssh),
+            max_login_failures=self.read_element_value(self.bf_max_login_failures),
+            penalty_period=self.read_element_value(self.bf_penality_period),
+        )
 
     def write_brute_force_protection_settings(self, settings: BruteForceProtection):
         """Populate the BruteForceProtection setting.
 
         :param settings: BruteForceProtection object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        self.set_element_value(self.bf_enable, settings.enable)
+        self.set_element_value(self.bf_ftp, settings.ftp_server)
+        self.set_element_value(self.bf_http, settings.http_server)
+        self.set_element_value(self.bf_https, settings.https_server)
+        self.set_element_value(self.bf_telnet, settings.telnet_server)
+        self.set_element_value(self.bf_tr069, settings.tr069_server)
+        self.set_element_value(self.bf_ssh, settings.ssh_server)
+        self.set_element_value(self.bf_max_login_failures, settings.max_login_failures)
+        self.set_element_value(self.bf_penality_period, settings.penalty_period)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_encryption_settings(self):
         """Return the current Encryption settings.
