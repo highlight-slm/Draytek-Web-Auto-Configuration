@@ -242,7 +242,6 @@ class ManagementPage(BasePageObject):
         :param settings: AccessList object
         """
         self.open_page()
-
         self.set_element_value(self.access_index_1, settings.list_1_ip_object_index)
         self.set_element_value(self.access_index_2, settings.list_2_ip_object_index)
         self.set_element_value(self.access_index_3, settings.list_3_ip_object_index)
@@ -261,15 +260,26 @@ class ManagementPage(BasePageObject):
 
         :returns: ManagementPort object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return AccessList(
+            user_defined_ports=self.read_element_value(self.user_defined_ports_radio),
+            telnet_port=self.read_element_value(self.telnet_port),
+            http_port=self.read_element_value(self.http_port),
+            https_port=self.read_element_value(self.https_port),
+            ftp_port=self.read_element_value(self.ftp_port),
+            tr069_port=self.read_element_value(self.tr069_port),
+            ssh_port=self.read_element_value(self.ssh_port),
+        )
 
     def write_management_port_settings(self, settings: ManagementPort):
         """Populate the ManagementPort setting.
 
         :param settings: ManagementPort object
         """
+        # Note special handling of default vs user ports required. To switch between radio buttons?
+        # If not user ports, are fields disabled?
         # TODO (#4421): Implement
+
         raise NotImplementedError
 
     def read_brute_force_protection_settings(self):
