@@ -188,7 +188,11 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_management_port_settings()
-        if name == "BruteForceProtection":
+        if name == "Encryption":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_encryption_settings()
+        if name == "":
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_brute_force_protection_settings()
@@ -246,6 +250,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_brute_force_protection_settings(settings)
+        elif name == "Encryption":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_encryption_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 

@@ -333,16 +333,26 @@ class ManagementPage(BasePageObject):
 
         :returns: Encryption object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return Encryption(
+            tls_1_2=self.read_element_value(self.enc_tls12),
+            tls_1_1=self.read_element_value(self.enc_tls11),
+            tls_1_0=self.read_element_value(self.enc_tls10),
+            ssl_3_0=self.read_element_value(self.enc_ssl30),
+        )
 
     def write_encryption_settings(self, settings: Encryption):
         """Populate the Encryption setting.
 
         :param settings: Encryption object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        self.set_element_value(self.enc_tls12, settings.tls_1_2)
+        self.set_element_value(self.enc_tls11, settings.tls_1_1)
+        self.set_element_value(self.enc_tls10, settings.tls_1_0)
+        self.set_element_value(self.enc_ssl30, settings.ssl_3_0)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_cvm_access_control_settings(self):
         """Return the current CVM_AccessControl settings.
