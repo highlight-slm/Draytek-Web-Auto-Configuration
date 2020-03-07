@@ -261,7 +261,7 @@ class ManagementPage(BasePageObject):
         :returns: ManagementPort object
         """
         self.open_page()
-        return AccessList(
+        return ManagementPort(
             user_defined_ports=self.read_element_value(self.user_defined_ports_radio),
             telnet_port=self.read_element_value(self.telnet_port),
             http_port=self.read_element_value(self.http_port),
@@ -276,11 +276,21 @@ class ManagementPage(BasePageObject):
 
         :param settings: ManagementPort object
         """
-        # Note special handling of default vs user ports required. To switch between radio buttons?
-        # If not user ports, are fields disabled?
-        # TODO (#4421): Implement
-
-        raise NotImplementedError
+        self.open_page()
+        if settings.user_defined_ports:
+            self.set_element_value(
+                self.user_defined_ports_radio, settings.user_defined_ports
+            )
+            self.set_element_value(self.telnet_port, settings.telnet_port)
+            self.set_element_value(self.http_port, settings.http_port)
+            self.set_element_value(self.https_port, settings.https_port)
+            self.set_element_value(self.ftp_port, settings.ftp_port)
+            self.set_element_value(self.tr069_port, settings.tr069_port)
+            self.set_element_value(self.ssh_port, settings.ssh_port)
+        else:
+            self.set_element_value(self.default_ports_radio, True)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_brute_force_protection_settings(self):
         """Return the current BruteForceProtection settings.

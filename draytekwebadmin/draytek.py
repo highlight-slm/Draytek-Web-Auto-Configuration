@@ -184,6 +184,10 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_access_list_settings()
+        if name == "ManagementPort":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_management_port_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -230,6 +234,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_access_list_settings(settings)
+        elif name == "ManagementPort":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_management_port_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 

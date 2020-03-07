@@ -2,7 +2,12 @@
 
 from draytekwebadmin.draytek import DrayTekWebAdmin
 from draytekwebadmin.snmp import SNMPIPv4, SNMPIPv6, SNMPTrapIPv4, SNMPTrapIPv6, SNMPv3
-from draytekwebadmin.management import Management, InternetAccessControl, AccessList
+from draytekwebadmin.management import (
+    Management,
+    InternetAccessControl,
+    AccessList,
+    ManagementPort,
+)
 from draytekwebadmin.firmware import Firmware
 
 __all__ = [
@@ -15,5 +20,6 @@ __all__ = [
     "Management",
     "InternetAccessControl",
     "AccessList",
+    "ManagementPort",
     "Firmware",
 ]
