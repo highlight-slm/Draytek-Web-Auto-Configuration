@@ -359,16 +359,26 @@ class ManagementPage(BasePageObject):
 
         :returns: CVM_AccessControl object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return CVM_AccessControl(
+            enable=self.read_element_value(self.cvm_port_enable),
+            ssl_enable=self.read_element_value(self.cvm_ssl_port_enable),
+            port=self.read_element_value(self.cvm_port),
+            ssl_port=self.read_element_value(self.cvm_ssl_port),
+        )
 
     def write_cvm_access_control_settings(self, settings: CVM_AccessControl):
         """Populate the CVM_AccessControl setting.
 
         :param settings: CVM_AccessControl object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        self.set_element_value(self.cvm_port_enable, settings.enable)
+        self.set_element_value(self.cvm_ssl_port_enable, settings.ssl_enable)
+        self.set_element_value(self.cvm_port, settings.port)
+        self.set_element_value(self.cvm_ssl_port, settings.ssl_port)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_ap_management_settings(self):
         """Return the current AP_Management settings.

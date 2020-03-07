@@ -184,13 +184,18 @@ class Encryption:
 class CVM_AccessControl:
     """CWM_AccessControl Object."""
 
-    def __init__(self, port=None, ssl_port=None):
+    def __init__(self, enable=None, ssl_enable=None, port=None, ssl_port=None):
         """Create a new CWM_AccessControl object."""
+        self.enable = enable
+        self.ssl_enable = ssl_enable
         self.port = port
         self.ssl_port = ssl_port
 
     def __setattr__(self, name, value):
-        value = port_or_none(value)
+        if name in ("enable", "ssl_enable"):
+            value = bool_or_none(value)
+        else:
+            value = port_or_none(value)
         super(CVM_AccessControl, self).__setattr__(name, value)
 
 

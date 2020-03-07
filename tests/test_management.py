@@ -206,14 +206,21 @@ class TestManagementEncryption(unittest.TestCase):
 class TestManagementCVMAccessControl(unittest.TestCase):
     def test_empty(self):
         empty = CVM_AccessControl()
+        self.assertIsNone(empty.enable)
+        self.assertIsNone(empty.ssl_enable)
         self.assertIsNone(empty.port)
         self.assertIsNone(empty.ssl_port)
 
     def test_valid(self):
+        self.assertTrue(CVM_AccessControl(enable=True).enable)
+        self.assertFalse(CVM_AccessControl(enable=False).enable)
+        self.assertTrue(CVM_AccessControl(ssl_enable=True).ssl_enable)
         self.assertEqual(1234, CVM_AccessControl(port=1234).port)
         self.assertEqual(5678, CVM_AccessControl(ssl_port=5678).ssl_port)
 
     def test_validation(self):
+        self.assertFalse(CVM_AccessControl(enable="fred").enable)
+        self.assertFalse(CVM_AccessControl(ssl_enable="fred").ssl_enable)
         self.assertEqual(1212, CVM_AccessControl(port="1212").port)
         with self.assertRaises(ValueError):
             self.assertTrue(CVM_AccessControl(ssl_port=999999).ssl_port)

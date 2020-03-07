@@ -192,10 +192,15 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_encryption_settings()
-        if name == "":
+        if name == "BruteForceProtection":
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_brute_force_protection_settings()
+        if name == "CVM_AccessControl":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_cvm_access_control_settings()
+
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -254,6 +259,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_encryption_settings(settings)
+        elif name == "CVM_AccessControl":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_cvm_access_control_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 
