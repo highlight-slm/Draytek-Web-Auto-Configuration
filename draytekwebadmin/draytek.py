@@ -172,10 +172,46 @@ class DrayTekWebAdmin:
             return SNMPpage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_snmp_v3_settings()
+        if name == "Management":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_management_settings()
         if name == "InternetAccessControl":
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_internet_access_control_settings()
+        if name == "AccessList":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_access_list_settings()
+        if name == "ManagementPort":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_management_port_settings()
+        if name == "Encryption":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_encryption_settings()
+        if name == "BruteForceProtection":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_brute_force_protection_settings()
+        if name == "CVM_AccessControl":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_cvm_access_control_settings()
+        if name == "AP_Management":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_ap_management_settings()
+        if name == "DeviceManagement":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_device_management_settings()
+        if name == "LAN_Access":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_lan_access_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -210,10 +246,46 @@ class DrayTekWebAdmin:
             reboot_req = SNMPpage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_snmp_v3_settings(settings)
+        elif name == "Management":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_management_settings(settings)
         elif name == "InternetAccessControl":
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_internet_access_control_settings(settings)
+        elif name == "AccessList":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_access_list_settings(settings)
+        elif name == "ManagementPort":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_management_port_settings(settings)
+        elif name == "BruteForceProtection":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_brute_force_protection_settings(settings)
+        elif name == "Encryption":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_encryption_settings(settings)
+        elif name == "CVM_AccessControl":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_cvm_access_control_settings(settings)
+        elif name == "AP_Management":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_ap_management_settings(settings)
+        elif name == "DeviceManagement":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_device_management_settings(settings)
+        elif name == "LAN_Access":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_lan_access_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 

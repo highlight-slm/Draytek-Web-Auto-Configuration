@@ -91,36 +91,21 @@ class SNMPpage(BasePageObject):
         :returns reboot required (bool) - Indicating if settings change requires a reboot
         """
         self.open_page()
-        if settings.enable_agent is not None:
-            self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
-        if settings.get_community is not None:
-            self.set_element_value(self.get_community, settings.get_community)
-        if settings.set_community is not None:
-            self.set_element_value(self.set_community, settings.set_community)
-        if settings.manager_host_1 is not None:
-            self.set_element_value(
-                self.manager_host_v4_index_1, settings.manager_host_1
-            )
-        if settings.manager_host_2 is not None:
-            self.set_element_value(
-                self.manager_host_v4_index_2, settings.manager_host_2
-            )
-        if settings.manager_host_3 is not None:
-            self.set_element_value(
-                self.manager_host_v4_index_3, settings.manager_host_3
-            )
-        if settings.manager_host_subnet_1 is not None:
-            self.set_element_value(
-                self.manager_host_v4_subnet_index_1, settings.manager_host_subnet_1
-            )
-        if settings.manager_host_subnet_2 is not None:
-            self.set_element_value(
-                self.manager_host_v4_subnet_index_2, settings.manager_host_subnet_2
-            )
-        if settings.manager_host_subnet_3 is not None:
-            self.set_element_value(
-                self.manager_host_v4_subnet_index_3, settings.manager_host_subnet_3
-            )
+        self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
+        self.set_element_value(self.get_community, settings.get_community)
+        self.set_element_value(self.set_community, settings.set_community)
+        self.set_element_value(self.manager_host_v4_index_1, settings.manager_host_1)
+        self.set_element_value(self.manager_host_v4_index_2, settings.manager_host_2)
+        self.set_element_value(self.manager_host_v4_index_3, settings.manager_host_3)
+        self.set_element_value(
+            self.manager_host_v4_subnet_index_1, settings.manager_host_subnet_1
+        )
+        self.set_element_value(
+            self.manager_host_v4_subnet_index_2, settings.manager_host_subnet_2
+        )
+        self.set_element_value(
+            self.manager_host_v4_subnet_index_3, settings.manager_host_subnet_3
+        )
         self.ok_button.click()
         return self.check_reboot()
 
@@ -155,36 +140,21 @@ class SNMPpage(BasePageObject):
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
         self.open_page()
-        if settings.enable_agent is not None:
-            self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
-        if settings.get_community is not None:
-            self.set_element_value(self.get_community, settings.get_community)
-        if settings.set_community is not None:
-            self.set_element_value(self.set_community, settings.set_community)
-        if settings.manager_host_1 is not None:
-            self.set_element_value(
-                self.manager_host_v6_index_1, settings.manager_host_1
-            )
-        if settings.manager_host_2 is not None:
-            self.set_element_value(
-                self.manager_host_v6_index_2, settings.manager_host_2
-            )
-        if settings.manager_host_3 is not None:
-            self.set_element_value(
-                self.manager_host_v6_index_3, settings.manager_host_3
-            )
-        if settings.manager_host_prelen_1 is not None:
-            self.set_element_value(
-                self.manager_host_v6_prelen_index_1, settings.manager_host_prelen_1
-            )
-        if settings.manager_host_prelen_2 is not None:
-            self.set_element_value(
-                self.manager_host_v6_prelen_index_2, settings.manager_host_prelen_2
-            )
-        if settings.manager_host_prelen_3 is not None:
-            self.set_element_value(
-                self.manager_host_v6_prelen_index_3, settings.manager_host_prelen_3
-            )
+        self.set_element_value(self.snmp_agent_enable, settings.enable_agent)
+        self.set_element_value(self.get_community, settings.get_community)
+        self.set_element_value(self.set_community, settings.set_community)
+        self.set_element_value(self.manager_host_v6_index_1, settings.manager_host_1)
+        self.set_element_value(self.manager_host_v6_index_2, settings.manager_host_2)
+        self.set_element_value(self.manager_host_v6_index_3, settings.manager_host_3)
+        self.set_element_value(
+            self.manager_host_v6_prelen_index_1, settings.manager_host_prelen_1
+        )
+        self.set_element_value(
+            self.manager_host_v6_prelen_index_2, settings.manager_host_prelen_2
+        )
+        self.set_element_value(
+            self.manager_host_v6_prelen_index_3, settings.manager_host_prelen_3
+        )
         self.ok_button.click()
         return self.check_reboot()
 
@@ -208,14 +178,10 @@ class SNMPpage(BasePageObject):
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
         self.open_page()
-        if settings.community is not None:
-            self.set_element_value(self.trap_community, settings.community)
-        if settings.timeout is not None:
-            self.set_element_value(self.trap_timeout, settings.timeout)
-        if settings.host_1 is not None:
-            self.set_element_value(self.trap_host_v4_index_1, settings.host_1)
-        if settings.host_2 is not None:
-            self.set_element_value(self.trap_host_v4_index_2, settings.host_2)
+        self.set_element_value(self.trap_community, settings.community)
+        self.set_element_value(self.trap_timeout, settings.timeout)
+        self.set_element_value(self.trap_host_v4_index_1, settings.host_1)
+        self.set_element_value(self.trap_host_v4_index_2, settings.host_2)
         self.ok_button.click()
         return self.check_reboot()
 
@@ -239,14 +205,10 @@ class SNMPpage(BasePageObject):
         :returns: reboot required (bool) - Indicating if settings change requires a reboot
         """
         self.open_page()
-        if settings.community is not None:
-            self.set_element_value(self.trap_community, settings.community)
-        if settings.timeout is not None:
-            self.set_element_value(self.trap_timeout, settings.timeout)
-        if settings.host_1 is not None:
-            self.set_element_value(self.trap_host_v6_index_1, settings.host_1)
-        if settings.host_2 is not None:
-            self.set_element_value(self.trap_host_v6_index_2, settings.host_2)
+        self.set_element_value(self.trap_community, settings.community)
+        self.set_element_value(self.trap_timeout, settings.timeout)
+        self.set_element_value(self.trap_host_v6_index_1, settings.host_1)
+        self.set_element_value(self.trap_host_v6_index_2, settings.host_2)
         self.ok_button.click()
         return self.check_reboot()
 
@@ -274,23 +236,17 @@ class SNMPpage(BasePageObject):
         # Note: To enable SNMPv3 agent, you also have to enable the SNMPv1v2 agent.
         # Which also needs v1v2 community strings, manager hosts etc.
         self.open_page()
-        if settings.enable_v3_agent is not None:
-            if not self.set_element_value(
-                self.snmpv3_agent_enable, settings.enable_v3_agent
-            ):
-                # Unable to enable V3 - Likely SNMP Agent for v1/v2 not enabled
-                raise ValueError(
-                    f"Can't enable SNMPv3 Agent. Draytek requires v2 to be enabled and configured to use SNMPv3."
-                )
-        if settings.usm_user is not None:
-            self.set_element_value(self.snmpv3_usm_user, settings.usm_user)
-        if settings.auth_algorithm is not None:
-            self.set_element_value(self.snmpv3_auth_algo, settings.auth_algorithm)
-        if settings.auth_password is not None:
-            self.set_element_value(self.snmpv3_auth_password, settings.auth_password)
-        if settings.priv_algorithm is not None:
-            self.set_element_value(self.snmpv3_priv_algo, settings.priv_algorithm)
-        if settings.priv_password is not None:
-            self.set_element_value(self.snmpv3_priv_password, settings.priv_password)
+        if not self.set_element_value(
+            self.snmpv3_agent_enable, settings.enable_v3_agent
+        ):
+            # Unable to enable V3 - Likely SNMP Agent for v1/v2 not enabled
+            raise ValueError(
+                f"Can't enable SNMPv3 Agent. Draytek requires v2 to be enabled and configured to use SNMPv3."
+            )
+        self.set_element_value(self.snmpv3_usm_user, settings.usm_user)
+        self.set_element_value(self.snmpv3_auth_algo, settings.auth_algorithm)
+        self.set_element_value(self.snmpv3_auth_password, settings.auth_password)
+        self.set_element_value(self.snmpv3_priv_algo, settings.priv_algorithm)
+        self.set_element_value(self.snmpv3_priv_password, settings.priv_password)
         self.ok_button.click()
         return self.check_reboot()

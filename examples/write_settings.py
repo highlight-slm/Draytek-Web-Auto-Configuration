@@ -16,6 +16,14 @@ from draytekwebadmin import (
     SNMPTrapIPv6,
     SNMPv3,
     InternetAccessControl,
+    AccessList,
+    ManagementPort,
+    BruteForceProtection,
+    Encryption,
+    CVM_AccessControl,
+    DeviceManagement,
+    AP_Management,
+    LAN_Access,
 )
 
 LOGGER = logging.getLogger("root")
@@ -226,6 +234,14 @@ def extract_settings(router_settings, separator="|"):
     snmp_trap_ipv6 = SNMPTrapIPv6()
     snmpv3 = SNMPv3()
     iac = InternetAccessControl()
+    access_list = AccessList()
+    management_port = ManagementPort()
+    brute_force = BruteForceProtection()
+    encryption = Encryption()
+    cvm_access = CVM_AccessControl()
+    device_management = DeviceManagement()
+    ap_management = AP_Management()
+    lan_access = LAN_Access()
     invalid = False
     try:
         for key in router_settings.keys():
@@ -268,6 +284,46 @@ def extract_settings(router_settings, separator="|"):
                     setattr(iac, fieldname, router_settings.get(key))
                 else:
                     invalid = True
+            elif modulename == type(access_list).__name__.lower():
+                if hasattr(access_list, fieldname):
+                    setattr(access_list, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(management_port).__name__.lower():
+                if hasattr(management_port, fieldname):
+                    setattr(management_port, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(brute_force).__name__.lower():
+                if hasattr(brute_force, fieldname):
+                    setattr(brute_force, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(encryption).__name__.lower():
+                if hasattr(encryption, fieldname):
+                    setattr(encryption, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(cvm_access).__name__.lower():
+                if hasattr(cvm_access, fieldname):
+                    setattr(cvm_access, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(device_management).__name__.lower():
+                if hasattr(device_management, fieldname):
+                    setattr(device_management, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(ap_management).__name__.lower():
+                if hasattr(ap_management, fieldname):
+                    setattr(ap_management, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
+            elif modulename == type(lan_access).__name__.lower():
+                if hasattr(lan_access, fieldname):
+                    setattr(lan_access, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
             if invalid:
                 LOGGER.error(f"Ignoring unexpected field: {modulename}|{fieldname}")
                 invalid = False
@@ -282,6 +338,14 @@ def extract_settings(router_settings, separator="|"):
     settings["snmp_trap_ipv6"] = snmp_trap_ipv6
     settings["snmpv3"] = snmpv3
     settings["iac"] = iac
+    settings["access_list"] = access_list
+    settings["management_port"] = management_port
+    settings["brute_force"] = brute_force
+    settings["encryption"] = encryption
+    settings["cvm_access"] = cvm_access
+    settings["device_management"] = device_management
+    settings["ap_management"] = ap_management
+    settings["lan_access"] = lan_access
     return settings
 
 

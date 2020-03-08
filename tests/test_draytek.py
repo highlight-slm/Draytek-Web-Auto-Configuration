@@ -6,9 +6,9 @@ from draytekwebadmin import DrayTekWebAdmin
 class TestDraytek(unittest.TestCase):
     def test_empty(self):
         default = DrayTekWebAdmin()
-        self.assertEqual(None, default.hostname)
+        self.assertIsNone(default.hostname)
         self.assertEqual("admin", default.username)
-        self.assertEqual(None, default.password)
+        self.assertIsNone(default.password)
         self.assertEqual(443, default.port)
         self.assertTrue(default.use_https)
         self.assertFalse(default.reboot_required)

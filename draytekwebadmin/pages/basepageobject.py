@@ -36,6 +36,8 @@ class BasePageObject(PageObject):
         :param value: Value to be set against element
         :return: true if setting applied
         """
+        if value is None:
+            return False
         if element.web_element.is_enabled():
             if type(element).__name__ == "InputText":
                 element.clear()
