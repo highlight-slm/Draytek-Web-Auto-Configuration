@@ -14,6 +14,14 @@ from draytekwebadmin import (
     SNMPTrapIPv6,
     SNMPv3,
     InternetAccessControl,
+    AccessList,
+    ManagementPort,
+    BruteForceProtection,
+    Encryption,
+    CVM_AccessControl,
+    DeviceManagement,
+    AP_Management,
+    LAN_Access,
 )
 
 LOGGER = logging.getLogger("root")
@@ -113,6 +121,14 @@ def read_data(session):
     snmp_trap_ipv6 = vars(session.read_settings(SNMPTrapIPv6))
     snmpv3 = vars(session.read_settings(SNMPv3))
     internet_access = vars(session.read_settings(InternetAccessControl))
+    access_list = vars(session.read_settings(AccessList))
+    management_port = vars(session.read_settings(ManagementPort))
+    brute_force = vars(session.read_settings(BruteForceProtection))
+    encryption = vars(session.read_settings(Encryption))
+    cvm_access = vars(session.read_settings(CVM_AccessControl))
+    device_management = vars(session.read_settings(DeviceManagement))
+    ap_management = vars(session.read_settings(AP_Management))
+    lan_access = vars(session.read_settings(LAN_Access))
 
     # Rename the dictionary keys to include the object model name
     sep = "|"
@@ -124,6 +140,14 @@ def read_data(session):
     snmp_trap_ipv6 = prefixKeys(snmp_trap_ipv6, SNMPTrapIPv6.__name__, sep)
     snmpv3 = prefixKeys(snmpv3, SNMPv3.__name__, sep)
     internet_access = prefixKeys(internet_access, InternetAccessControl.__name__, sep)
+    access_list = prefixKeys(access_list, AccessList.__name__, sep)
+    management_port = prefixKeys(management_port, ManagementPort.__name__, sep)
+    brute_force = prefixKeys(brute_force, BruteForceProtection.__name__, sep)
+    encryption = prefixKeys(encryption, Encryption.__name__, sep)
+    cvm_access = prefixKeys(cvm_access, CVM_AccessControl.__name__, sep)
+    device_management = prefixKeys(device_management, DeviceManagement.__name__, sep)
+    ap_management = prefixKeys(ap_management, AP_Management.__name__, sep)
+    lan_access = prefixKeys(lan_access, LAN_Access.__name__, sep)
 
     # Merge the data sources into a single dictionary
     data = {
@@ -135,6 +159,14 @@ def read_data(session):
         **snmp_trap_ipv6,
         **snmpv3,
         **internet_access,
+        **access_list,
+        **management_port,
+        **brute_force,
+        **encryption,
+        **cvm_access,
+        **device_management,
+        **ap_management,
+        **lan_access,
     }
     return data
 

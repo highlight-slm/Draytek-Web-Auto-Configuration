@@ -11,25 +11,13 @@ Example utilities are provided which demonstrate how the library can be used to 
 
 The following capabilities are currently implemented:
 
-- Reading and writing Internet Access Control settings (_System Maintenance >> Management >> Internet Access Control_)
-  - Enabling/Disabling remote management via the WAN interface
-  - Restricting remote access to a defined domain name
-  - Enabling/Disabling specific protocols are exposed via the WAN
+- Reading and writing all Management settings (_System Maintenance >> Management_)
 - Reading and writing SNMP settings (_System Maintenance >> SNMP_)
-  - Enabling SNMP Agent
-  - SNMPv2 community strings
-  - Allowed Management Host IPs (IPv4 & IPv6)
-  - SNMP trap community
-  - SNMP trap hosts (IPv4 and IPv6)
-  - SNMP trap timeout
-  - SNMPv3 settings (Note: Draytek required SNMPv2 to be enabled and configured to use SNMPv3)
 - Router firmware upgrade (_System Maintenance >> Firmware Upgrade_)
   - Uploading a firmware file
   - Previewing the file to determine if an upgrade is needed
   - Performing an upgrade and rebooting
 - Router Reboot (immediately, using current configuration)
-
-Note: Full data models have been created for the SNMP and Management pages. Enabling anyone to contribute further to add the extra settings they need to configure.
 
 ## Tested Devices
 
