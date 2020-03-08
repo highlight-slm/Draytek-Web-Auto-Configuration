@@ -385,16 +385,18 @@ class ManagementPage(BasePageObject):
 
         :returns: AP_Management object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return AP_Management(enable=self.read_element_value(self.ap_management),)
 
     def write_ap_management_settings(self, settings: AP_Management):
         """Populate the AP_Management setting.
 
         :param settings: AP_Management object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        self.set_element_value(self.ap_management, settings.enable)
+        self.ok_button.click()
+        return self.check_reboot()
 
     def read_device_management_settings(self):
         """Return the current DeviceManagement settings.
