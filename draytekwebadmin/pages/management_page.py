@@ -12,6 +12,7 @@ from draytekwebadmin.management import (
     Management,
     ManagementPort,
     Encryption,
+    LAN_Access,
 )
 from draytekwebadmin.pages.menu_navigator import MenuNavigator
 from draytekwebadmin.pages.basepageobject import BasePageObject
@@ -132,10 +133,10 @@ class ManagementPage(BasePageObject):
     subnet_lan_ip_routed_use_index = Checkbox(By.NAME, "iMngObjensub")
     subnet_lan_ip_routed_index = InputText(By.NAME, "iMngObjidxsub")
 
-    def open_page(self):
+    def open_page(self, tab=None):
         """Navigate menus to open SNMP configuration page."""
         menu = MenuNavigator(self.driver_wrapper)
-        menu.open_sysmain_management()
+        menu.open_sysmain_management(tab)
 
     def check_reboot(self):
         """Check if reboot page is displayed, if so set flag to indicate a reboot is required.
@@ -150,7 +151,7 @@ class ManagementPage(BasePageObject):
         :returns: Management object
 
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return Management(
             router_name=self.read_element_value(self.router_name),
             disable_auto_logout=self.read_element_value(self.disable_auto_logout),
@@ -162,7 +163,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: Management object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.router_name, settings.router_name)
         self.set_element_value(self.disable_auto_logout, settings.disable_auto_logout)
         self.set_element_value(
@@ -176,7 +177,7 @@ class ManagementPage(BasePageObject):
 
         :returns: InternetAccessControl object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return InternetAccessControl(
             internet_management=self.read_element_value(self.enable_internet_access),
             domain_name_allowed=self.read_element_value(self.domain_name_allowed),
@@ -198,7 +199,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: InternetAccessControl object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(
             self.enable_internet_access, settings.internet_management
         )
@@ -222,7 +223,7 @@ class ManagementPage(BasePageObject):
 
         :returns: AccessList object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return AccessList(
             list_1_ip_object_index=self.read_element_value(self.access_index_1),
             list_2_ip_object_index=self.read_element_value(self.access_index_2),
@@ -241,7 +242,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: AccessList object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.access_index_1, settings.list_1_ip_object_index)
         self.set_element_value(self.access_index_2, settings.list_2_ip_object_index)
         self.set_element_value(self.access_index_3, settings.list_3_ip_object_index)
@@ -260,7 +261,7 @@ class ManagementPage(BasePageObject):
 
         :returns: ManagementPort object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return ManagementPort(
             user_defined_ports=self.read_element_value(self.user_defined_ports_radio),
             telnet_port=self.read_element_value(self.telnet_port),
@@ -276,7 +277,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: ManagementPort object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         if settings.user_defined_ports:
             self.set_element_value(
                 self.user_defined_ports_radio, settings.user_defined_ports
@@ -297,7 +298,7 @@ class ManagementPage(BasePageObject):
 
         :returns: BruteForceProtection object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return BruteForceProtection(
             enable=self.read_element_value(self.bf_enable),
             ftp_server=self.read_element_value(self.bf_ftp),
@@ -315,7 +316,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: BruteForceProtection object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.bf_enable, settings.enable)
         self.set_element_value(self.bf_ftp, settings.ftp_server)
         self.set_element_value(self.bf_http, settings.http_server)
@@ -333,7 +334,7 @@ class ManagementPage(BasePageObject):
 
         :returns: Encryption object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return Encryption(
             tls_1_2=self.read_element_value(self.enc_tls12),
             tls_1_1=self.read_element_value(self.enc_tls11),
@@ -346,7 +347,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: Encryption object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.enc_tls12, settings.tls_1_2)
         self.set_element_value(self.enc_tls11, settings.tls_1_1)
         self.set_element_value(self.enc_tls10, settings.tls_1_0)
@@ -359,7 +360,7 @@ class ManagementPage(BasePageObject):
 
         :returns: CVM_AccessControl object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return CVM_AccessControl(
             enable=self.read_element_value(self.cvm_port_enable),
             ssl_enable=self.read_element_value(self.cvm_ssl_port_enable),
@@ -372,7 +373,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: CVM_AccessControl object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.cvm_port_enable, settings.enable)
         self.set_element_value(self.cvm_ssl_port_enable, settings.ssl_enable)
         self.set_element_value(self.cvm_port, settings.port)
@@ -385,7 +386,7 @@ class ManagementPage(BasePageObject):
 
         :returns: AP_Management object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return AP_Management(enable=self.read_element_value(self.ap_management),)
 
     def write_ap_management_settings(self, settings: AP_Management):
@@ -393,7 +394,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: AP_Management object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.ap_management, settings.enable)
         self.ok_button.click()
         return self.check_reboot()
@@ -403,7 +404,7 @@ class ManagementPage(BasePageObject):
 
         :returns: DeviceManagement object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         return DeviceManagement(
             enable=self.read_element_value(self.device_management),
             respond_to_external_device=self.read_element_value(
@@ -416,7 +417,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: DeviceManagement object
         """
-        self.open_page()
+        self.open_page(tab=self.management_setup_tab)
         self.set_element_value(self.device_management, settings.enable)
         self.set_element_value(
             self.device_management_respond_external, settings.respond_to_external_device
@@ -424,5 +425,90 @@ class ManagementPage(BasePageObject):
         self.ok_button.click()
         return self.check_reboot()
 
+    def read_lan_access_settings(self):
+        """Return the current LAN_Access settings.
 
-# TODO: LAN Tab classes not created.
+        :returns: LAN_Access object
+        """
+        self.open_page(tab=self.lan_access_setup_tab)
+        return LAN_Access(
+            enable=self.read_element_value(self.allow_management_from_lan),
+            ftp_server=self.read_element_value(self.lan_ftp),
+            http_server=self.read_element_value(self.lan_http),
+            enforce_https_access=self.read_element_value(self.lan_enforce_https_access),
+            https_server=self.read_element_value(self.lan_https),
+            telnet_server=self.read_element_value(self.lan_telnet),
+            tr069_server=self.read_element_value(self.lan_tr069),
+            ssh_server=self.read_element_value(self.lan_ssh),
+            lan_1_access=self.read_element_value(self.subnet_lan_1),
+            lan_1_use_index=self.read_element_value(self.subnet_lan_1_use_index),
+            lan_1_index=self.read_element_value(self.subnet_lan_1_index),
+            lan_2_access=self.read_element_value(self.subnet_lan_2),
+            lan_2_use_index=self.read_element_value(self.subnet_lan_2_use_index),
+            lan_2_index=self.read_element_value(self.subnet_lan_2_index),
+            lan_3_access=self.read_element_value(self.subnet_lan_3),
+            lan_3_use_index=self.read_element_value(self.subnet_lan_3_use_index),
+            lan_3_index=self.read_element_value(self.subnet_lan_3_index),
+            lan_4_access=self.read_element_value(self.subnet_lan_4),
+            lan_4_use_index=self.read_element_value(self.subnet_lan_4_use_index),
+            lan_4_index=self.read_element_value(self.subnet_lan_4_index),
+            lan_5_access=self.read_element_value(self.subnet_lan_5),
+            lan_5_use_index=self.read_element_value(self.subnet_lan_5_use_index),
+            lan_5_index=self.read_element_value(self.subnet_lan_5_index),
+            lan_6_access=self.read_element_value(self.subnet_lan_6),
+            lan_6_use_index=self.read_element_value(self.subnet_lan_6_use_index),
+            lan_6_index=self.read_element_value(self.subnet_lan_6_index),
+            dmz_access=self.read_element_value(self.subnet_lan_dmz),
+            lan_ip_routed_access=self.read_element_value(self.subnet_lan_ip_routed),
+            lan_ip_routed_use_index=self.read_element_value(
+                self.subnet_lan_ip_routed_use_index
+            ),
+            lan_ip_routed_index=self.read_element_value(
+                self.subnet_lan_ip_routed_index
+            ),
+        )
+
+    def write_lan_access_settings(self, settings: LAN_Access):
+        """Populate the LAN_Access setting.
+
+        :param settings: LAN_Access object
+        """
+        self.open_page(tab=self.lan_access_setup_tab)
+        self.set_element_value(self.allow_management_from_lan, settings.enable)
+        self.set_element_value(self.lan_ftp, settings.ftp_server)
+        self.set_element_value(self.lan_http, settings.http_server)
+        self.set_element_value(
+            self.lan_enforce_https_access, settings.enforce_https_access
+        )
+        self.set_element_value(self.lan_https, settings.https_server)
+        self.set_element_value(self.lan_telnet, settings.telnet_server)
+        self.set_element_value(self.lan_tr069, settings.tr069_server)
+        self.set_element_value(self.lan_ssh, settings.ssh_server)
+        self.set_element_value(self.subnet_lan_1, settings.lan_1_access)
+        self.set_element_value(self.subnet_lan_1_use_index, settings.lan_1_use_index)
+        self.set_element_value(self.subnet_lan_1_index, settings.lan_1_index)
+        self.set_element_value(self.subnet_lan_2, settings.lan_2_access)
+        self.set_element_value(self.subnet_lan_2_use_index, settings.lan_2_use_index)
+        self.set_element_value(self.subnet_lan_2_index, settings.lan_2_index)
+        self.set_element_value(self.subnet_lan_3, settings.lan_3_access)
+        self.set_element_value(self.subnet_lan_3_use_index, settings.lan_3_use_index)
+        self.set_element_value(self.subnet_lan_3_index, settings.lan_3_index)
+        self.set_element_value(self.subnet_lan_4, settings.lan_4_access)
+        self.set_element_value(self.subnet_lan_4_use_index, settings.lan_4_use_index)
+        self.set_element_value(self.subnet_lan_4_index, settings.lan_4_index)
+        self.set_element_value(self.subnet_lan_5, settings.lan_5_access)
+        self.set_element_value(self.subnet_lan_5_use_index, settings.lan_5_use_index)
+        self.set_element_value(self.subnet_lan_5_index, settings.lan_5_index)
+        self.set_element_value(self.subnet_lan_6, settings.lan_6_access)
+        self.set_element_value(self.subnet_lan_6_use_index, settings.lan_6_use_index)
+        self.set_element_value(self.subnet_lan_6_index, settings.lan_6_index)
+        self.set_element_value(self.subnet_lan_dmz, settings.dmz_access)
+        self.set_element_value(self.subnet_lan_ip_routed, settings.lan_ip_routed_access)
+        self.set_element_value(
+            self.subnet_lan_ip_routed_use_index, settings.lan_ip_routed_use_index
+        )
+        self.set_element_value(
+            self.subnet_lan_ip_routed_index, settings.lan_ip_routed_index
+        )
+        self.ok_button.click()
+        return self.check_reboot()

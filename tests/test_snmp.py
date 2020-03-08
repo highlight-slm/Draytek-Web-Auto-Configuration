@@ -45,14 +45,14 @@ class TestSNMPv3(unittest.TestCase):
         self.assertEqual("MD5", SNMPv3(auth_algorithm="MD5").auth_algorithm)
         self.assertEqual("SHA", SNMPv3(auth_algorithm="SHA").auth_algorithm)
         self.assertEqual("secret", SNMPv3(auth_password="secret").auth_password)
-        self.assertEqual(None, SNMPv3(auth_password="********").auth_password)
+        self.assertIsNone(SNMPv3(auth_password="********").auth_password)
         self.assertEqual("No Priv", SNMPv3(priv_algorithm="No Priv").priv_algorithm)
         self.assertEqual("DES", SNMPv3(priv_algorithm="DES").priv_algorithm)
         self.assertEqual("AES", SNMPv3(priv_algorithm="AES").priv_algorithm)
         self.assertEqual(
             "another secret", SNMPv3(priv_password="another secret").priv_password
         )
-        self.assertEqual(None, SNMPv3(priv_password="***").priv_password)
+        self.assertIsNone(SNMPv3(priv_password="***").priv_password)
 
     def test_validation(self):
         with self.assertRaises(ValueError):
@@ -125,7 +125,7 @@ class TestSNMPIPv6(unittest.TestCase):
             ).manager_host_1,
         )
         self.assertEqual(1, SNMPIPv6(manager_host_prelen_1=1).manager_host_prelen_1)
-        self.assertEqual(None, SNMPIPv6(manager_host_prelen_1="").manager_host_prelen_1)
+        self.assertIsNone(SNMPIPv6(manager_host_prelen_1="").manager_host_prelen_1)
 
     def test_validation(self):
         with self.assertRaises(ValueError):

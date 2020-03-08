@@ -142,6 +142,8 @@ def int_or_none(value):
     """
     if value is None:
         return None
+    if value == "":
+        return None
     return int(value)
 
 

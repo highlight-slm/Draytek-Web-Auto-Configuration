@@ -222,3 +222,87 @@ class DeviceManagement:
     def __setattr__(self, name, value):
         value = bool_or_none(value)
         super(DeviceManagement, self).__setattr__(name, value)
+
+
+class LAN_Access:
+    """LAN_Access object."""
+
+    def __init__(
+        self,
+        enable=None,
+        ftp_server=None,
+        http_server=None,
+        enforce_https_access=None,
+        https_server=None,
+        telnet_server=None,
+        tr069_server=None,
+        ssh_server=None,
+        lan_1_access=None,
+        lan_1_use_index=None,
+        lan_1_index=None,
+        lan_2_access=None,
+        lan_2_use_index=None,
+        lan_2_index=None,
+        lan_3_access=None,
+        lan_3_use_index=None,
+        lan_3_index=None,
+        lan_4_access=None,
+        lan_4_use_index=None,
+        lan_4_index=None,
+        lan_5_access=None,
+        lan_5_use_index=None,
+        lan_5_index=None,
+        lan_6_access=None,
+        lan_6_use_index=None,
+        lan_6_index=None,
+        dmz_access=None,
+        lan_ip_routed_access=None,
+        lan_ip_routed_use_index=None,
+        lan_ip_routed_index=None,
+    ):
+        """Create a new LAN_Access object."""
+        self.enable = enable
+        self.ftp_server = ftp_server
+        self.http_server = http_server
+        self.enforce_https_access = enforce_https_access
+        self.https_server = https_server
+        self.telnet_server = telnet_server
+        self.tr069_server = tr069_server
+        self.ssh_server = ssh_server
+        self.lan_1_access = lan_1_access
+        self.lan_1_use_index = lan_1_use_index
+        self.lan_1_index = lan_1_index
+        self.lan_2_access = lan_2_access
+        self.lan_2_use_index = lan_2_use_index
+        self.lan_2_index = lan_2_index
+        self.lan_3_access = lan_3_access
+        self.lan_3_use_index = lan_3_use_index
+        self.lan_3_index = lan_3_index
+        self.lan_4_access = lan_4_access
+        self.lan_4_use_index = lan_4_use_index
+        self.lan_4_index = lan_4_index
+        self.lan_5_access = lan_5_access
+        self.lan_5_use_index = lan_5_use_index
+        self.lan_5_index = lan_5_index
+        self.lan_6_access = lan_6_access
+        self.lan_6_use_index = lan_6_use_index
+        self.lan_6_index = lan_6_index
+        self.dmz_access = dmz_access
+        self.lan_ip_routed_access = lan_ip_routed_access
+        self.lan_ip_routed_use_index = lan_ip_routed_use_index
+        self.lan_ip_routed_index = lan_ip_routed_index
+
+    def __setattr__(self, name, value):
+        if name in (
+            "lan_1_index",
+            "lan_2_index",
+            "lan_3_index",
+            "lan_4_index",
+            "lan_5_index",
+            "lan_6_index",
+            "lan_ip_routed_index",
+        ):
+            value = int_or_none(value)
+        else:
+            value = bool_or_none(value)
+        super(LAN_Access, self).__setattr__(name, value)

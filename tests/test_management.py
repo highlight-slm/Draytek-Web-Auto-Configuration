@@ -10,6 +10,7 @@ from draytekwebadmin.management import (
     CVM_AccessControl,
     AP_Management,
     DeviceManagement,
+    LAN_Access,
 )
 
 
@@ -259,3 +260,60 @@ class TestManagementDeviceManagement(unittest.TestCase):
         self.assertFalse(
             DeviceManagement(respond_to_external_device=0).respond_to_external_device
         )
+
+
+class TestManagementLAN_Access(unittest.TestCase):
+    def test_empty(self):
+        empty = LAN_Access()
+        self.assertIsNone(empty.enable)
+        self.assertIsNone(empty.ftp_server)
+        self.assertIsNone(empty.http_server)
+        self.assertIsNone(empty.enforce_https_access)
+        self.assertIsNone(empty.https_server)
+        self.assertIsNone(empty.telnet_server)
+        self.assertIsNone(empty.tr069_server)
+        self.assertIsNone(empty.ssh_server)
+        self.assertIsNone(empty.lan_1_access)
+        self.assertIsNone(empty.lan_1_use_index)
+        self.assertIsNone(empty.lan_1_index)
+        self.assertIsNone(empty.lan_2_access)
+        self.assertIsNone(empty.lan_2_use_index)
+        self.assertIsNone(empty.lan_2_index)
+        self.assertIsNone(empty.lan_3_access)
+        self.assertIsNone(empty.lan_3_use_index)
+        self.assertIsNone(empty.lan_3_index)
+        self.assertIsNone(empty.lan_4_access)
+        self.assertIsNone(empty.lan_4_use_index)
+        self.assertIsNone(empty.lan_4_index)
+        self.assertIsNone(empty.lan_5_access)
+        self.assertIsNone(empty.lan_5_use_index)
+        self.assertIsNone(empty.lan_5_index)
+        self.assertIsNone(empty.lan_6_access)
+        self.assertIsNone(empty.lan_6_use_index)
+        self.assertIsNone(empty.lan_6_index)
+        self.assertIsNone(empty.dmz_access)
+        self.assertIsNone(empty.lan_ip_routed_access)
+        self.assertIsNone(empty.lan_ip_routed_use_index)
+        self.assertIsNone(empty.lan_ip_routed_index)
+
+    def test_valid(self):
+        self.assertTrue(LAN_Access(enable=True).enable)
+        self.assertTrue(LAN_Access(ftp_server=True).ftp_server)
+        self.assertTrue(LAN_Access(http_server=True).http_server)
+        self.assertTrue(LAN_Access(enforce_https_access=True).enforce_https_access)
+        self.assertTrue(LAN_Access(https_server=True).https_server)
+        self.assertTrue(LAN_Access(telnet_server=True).telnet_server)
+        self.assertTrue(LAN_Access(tr069_server=True).tr069_server)
+        self.assertTrue(LAN_Access(ssh_server=True).ssh_server)
+        self.assertTrue(LAN_Access(ssh_server=True).ssh_server)
+        self.assertTrue(LAN_Access(lan_1_access=True).lan_1_access)
+        self.assertTrue(LAN_Access(lan_2_use_index=True).lan_2_use_index)
+        self.assertEqual(12, LAN_Access(lan_3_index=12).lan_3_index)
+
+    def test_validation(self):
+        self.assertTrue(LAN_Access(enable=1).enable)
+        self.assertIsNone(LAN_Access(lan_1_index="").lan_1_index)
+        self.assertFalse(LAN_Access(ftp_server=0).ftp_server)
+        self.assertFalse(LAN_Access(lan_4_use_index="hello").lan_4_use_index)
+        with self.assertRaises(ValueError):
+            self.assertTrue(LAN_Access(lan_4_index="world").lan_4_use_index)

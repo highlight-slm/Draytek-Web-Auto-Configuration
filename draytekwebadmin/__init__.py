@@ -12,6 +12,7 @@ from draytekwebadmin.management import (
     CVM_AccessControl,
     DeviceManagement,
     AP_Management,
+    LAN_Access,
 )
 from draytekwebadmin.firmware import Firmware
 
@@ -31,5 +32,6 @@ __all__ = [
     "CVM_AccessControl",
     "AP_Management",
     "DeviceManagement",
+    "LAN_Access",
     "Firmware",
 ]

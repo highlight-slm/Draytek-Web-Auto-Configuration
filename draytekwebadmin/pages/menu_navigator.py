@@ -35,7 +35,7 @@ class MenuNavigator(BasePageObject):
         self.driver.switch_to.default_content()
         self.driver.switch_to.frame(self.frame_main)
 
-    def open_sysmain_management(self):
+    def open_sysmain_management(self, tab: Link):
         """Navigate the menus to open the SNMP configuration panel."""
         self.driver.switch_to.default_content()
         self.driver.switch_to.frame(self.frame_menu)
@@ -44,6 +44,8 @@ class MenuNavigator(BasePageObject):
         self.menu_management.click()
         self.driver.switch_to.default_content()
         self.driver.switch_to.frame(self.frame_main)
+        if tab and tab.is_visible():
+            tab.click()
 
     def open_sysmain_reboot_system(self):
         """Navigate the menus to open the Reboot System panel."""
