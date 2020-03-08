@@ -204,6 +204,10 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_ap_management_settings()
+        if name == "DeviceManagement":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_device_management_settings()
         raise TypeError(f"Unexpected object type: {name}")
 
     def write_settings(self, settings):
@@ -270,6 +274,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_ap_management_settings(settings)
+        elif name == "DeviceManagement":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_device_management_settings(settings)
         else:
             raise TypeError(f"Unexpected object type: {name}")
 

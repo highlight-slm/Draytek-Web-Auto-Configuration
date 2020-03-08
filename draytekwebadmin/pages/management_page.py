@@ -98,7 +98,7 @@ class ManagementPage(BasePageObject):
 
     # Device Management
     device_management = Checkbox(By.NAME, "chkDevMng")
-    device_management_respond_external = Checkbox(By.NAME, "")
+    device_management_respond_external = Checkbox(By.NAME, "NoRsp2ExDev")
 
     # TAB: LAN Access Setup
     allow_management_from_lan = Checkbox(By.NAME, "sMngtfrmLanEn1")
@@ -403,16 +403,26 @@ class ManagementPage(BasePageObject):
 
         :returns: DeviceManagement object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        return DeviceManagement(
+            enable=self.read_element_value(self.device_management),
+            respond_to_external_device=self.read_element_value(
+                self.device_management_respond_external
+            ),
+        )
 
     def write_device_management_settings(self, settings: DeviceManagement):
         """Populate the DeviceManagement setting.
 
         :param settings: DeviceManagement object
         """
-        # TODO (#4421): Implement
-        raise NotImplementedError
+        self.open_page()
+        self.set_element_value(self.device_management, settings.enable)
+        self.set_element_value(
+            self.device_management_respond_external, settings.respond_to_external_device
+        )
+        self.ok_button.click()
+        return self.check_reboot()
 
 
 # TODO: LAN Tab classes not created.

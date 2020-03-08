@@ -10,6 +10,7 @@ from draytekwebadmin.management import (
     BruteForceProtection,
     Encryption,
     CVM_AccessControl,
+    DeviceManagement,
     AP_Management,
 )
 from draytekwebadmin.firmware import Firmware
@@ -29,5 +30,6 @@ __all__ = [
     "Encryption",
     "CVM_AccessControl",
     "AP_Management",
+    "DeviceManagement",
     "Firmware",
 ]
