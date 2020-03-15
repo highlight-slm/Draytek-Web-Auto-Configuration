@@ -13,6 +13,7 @@ from draytekwebadmin.pages import (
 )
 from draytekwebadmin.utils import (
     bool_or_none,
+    int_or_none,
     port_or_none,
     valid_hostname,
     valid_ipv4_address,
@@ -34,15 +35,25 @@ class DrayTekWebAdmin:
         port=443,
         use_https=True,
         config_dir=None,
+        browser=None,
+        headless=None,
+        search_driver=None,
+        implicit_wait_time=None,
+        explicit_wait_time=None,
     ):
         """Create a web session to the web administration console.
 
         :param hostname: IP address or DNS name of Web admin interface on the router
-        :param port: (optional) Port running the web admin console (Default: 443)
+        :param port: Port running the web admin console (Default: 443)
         :param username: Web admin account username (default: admin)
         :param password: Password for admin account
-        :param use_https: (optional) Use https instead of http (Default: True)
-        :param config_dir: (optional) Path to toolium configuration files
+        :param use_https: Use https instead of http (Default: True)
+        :param config_dir: Path to toolium configuration files
+        :param browser: Name of browser to use [chrome, firefox]. Overrides configuration file.
+        :param headless: Boolean to run the session headless, without GUI visible. Overrides configuration file.
+        :param search_driver: Attempt to locate driver executables in local directories. Overrides configuration file.
+        :param implicit_wait_time: Web driver implicit wait time (seconds). Overrides configuration file.
+        :param explicit_wait_time: Web driver explicit wait time (seconds). Overrides configuration file.
         """
         self.hostname = hostname
         self.port = port
@@ -50,6 +61,11 @@ class DrayTekWebAdmin:
         self.password = password
         self.use_https = use_https
         self.config_dir = config_dir
+        self.browser = browser
+        self.headless = headless
+        self.search_driver = search_driver
+        self.implicit_wait_time = implicit_wait_time
+        self.explicit_wait_time = explicit_wait_time
         self.loggedin = False
         self.reboot_required = False
         self.routerinfo = None
@@ -64,10 +80,18 @@ class DrayTekWebAdmin:
                 or valid_ipv6_address(value)
             ):
                 raise ValueError(f"Invalid hostname: {value}")
-        if name in ["use_https", "loggedin", "reboot_required"]:
+        if name in [
+            "use_https",
+            "loggedin",
+            "reboot_required",
+            "headless",
+            "search_driver",
+        ]:
             value = bool_or_none(value)
         elif name == "port":
             value = port_or_none(value)
+        elif name in ["implicit_wait_time", "explicit_wait_time"]:
+            value = int_or_none(value)
         super(DrayTekWebAdmin, self).__setattr__(name, value)
 
     @property
@@ -80,7 +104,14 @@ class DrayTekWebAdmin:
             try:
                 LOGGER.info("Creating and opening session")
                 self._session = TooliumSession()
-                self._session.setUp(configuration_directory=self.config_dir)
+                self._session.setUp(
+                    config_dir=self.config_dir,
+                    browser=self.browser,
+                    search_driver=self.search_driver,
+                    headless=self.headless,
+                    implicit_wait=self.implicit_wait_time,
+                    explicit_wait=self.explicit_wait_time,
+                )
                 self._session.driver.get(self.url)
                 LOGGER.info(f"Connected to: {self.url} - {self._session.driver.title}")
             except Exception:

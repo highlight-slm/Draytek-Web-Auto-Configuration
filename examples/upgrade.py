@@ -45,17 +45,41 @@ def _get_parser():
         help="Perform firmware upgrade (inc reboot), preview only",
     )
     parser.add_argument(
-        "-d",
+        "-c",
+        "--config",
+        type=dir_path,
+        help=r"Location of configuration file directory e.g. -c c:\draytekwebadmin\conf",
+    )
+    parser.add_argument(
+        "--browser",
+        type=str,
+        help="Browser name [chrome|firefox] overrides configuration file",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run session headless (without GUI). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--search_driver",
+        action="store_true",
+        help="Searches for browser driver in current directory, under conf or driver. Overrides configuration file",
+    )
+    parser.add_argument(
+        "--implicit_wait",
+        type=int,
+        help="WebDriver implicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--explicit_wait",
+        type=int,
+        help="WebDriver explicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         default=False,
         help="Errors will attempt to capture Web page",
-    )
-    parser.add_argument(
-        "-c",
-        "--config",
-        type=dir_path,
-        help=r"Location of configuration file directory e.g. -c c:\upgrade\conf",
     )
     return parser
 
@@ -81,12 +105,11 @@ def read_csv(csvfilename):
     return dict_list
 
 
-def check_upgrade_router(router, config_dir=None, debug=False):
+def check_upgrade_router(router, test_settings):
     """Check Upgrade firmware on Draytek Router
 
     :param router: row from CSV with settings for a single router
-    :param config_dir: path to configuration file for toolium
-    :param debug: write a debug files of the page source on exception
+    :param test_settings: collection of test settings
     :returns: DraytekWebAdmin Session object
     :returns: DraytekWebAdmin Firmware object
     """
@@ -94,9 +117,14 @@ def check_upgrade_router(router, config_dir=None, debug=False):
     preview = None
 
     try:
-        settings = extract_settings(router, config_dir)
+        settings = extract_settings(router, test_settings.config_dir)
 
         webadmin_session = settings["connection"]
+        webadmin_session.browser = test_settings.browser
+        webadmin_session.headless = test_settings.headless
+        webadmin_session.search_driver = test_settings.search_driver
+        webadmin_session.implicit_wait_time = test_settings.implicit_wait_time
+        webadmin_session.explcit_wait_time = test_settings.explicit_wait_time
         preview = webadmin_session.upgrade_preview(
             Firmware(filepath=settings["firmware"].filepath)
         )
@@ -105,7 +133,7 @@ def check_upgrade_router(router, config_dir=None, debug=False):
     except Exception as exception:
         LOGGER.critical(exception)
         if webadmin_session is not None:
-            if debug:
+            if test_settings.debug:
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 # Collect the information from the session object and close it before attempting file access in case that fails
                 # This avoids having another try/except/finally block within this error handling routine.
@@ -197,17 +225,15 @@ def create_template_csv(output_file):
         csvfile.writeheader()
 
 
-def upgrade_router(router, upgrade, config_dir, debug=False):
+def upgrade_router(router, test_settings):
     """Upgrade router firmware, or preview potential upgrade
 
     :param router: connection information from csv input file
-    :param upgrade: Flag to allow upgrade to run, preview otherwise
-    :param config_dir: path to configuration file for toolium
-    :param debug: write a debug files of the page source on exception
+    :param test_settings: collection of test settings
     :return: webadmin_session
     :return: router firmware object
     :return: Upgrade status message
-    :return: Upgrade required boolean
+    :return: Upgrade required Boolean
     """
 
     session = None
@@ -216,13 +242,13 @@ def upgrade_router(router, upgrade, config_dir, debug=False):
     upgrade_required = False
     try:
         (session, router_firmware) = check_upgrade_router(
-            router=router, config_dir=config_dir, debug=debug
+            router=router, test_settings=test_settings
         )
         if (session) and (router_firmware):  # Both values not None
             if (router_firmware.router_firmware_upgradable()) or (
                 router_firmware.modem_firmware_upgradable()
             ):
-                if upgrade:
+                if test_settings.upgrade:
                     upgrade_status_message = "UPGRADED!"
                     LOGGER.info(f"Router {session.hostname} - Upgrading Router")
                     session.upgrade(router_firmware)
@@ -246,7 +272,7 @@ def result_row_builder(session, status, firmware=None, router_name=None):
     """Generate data for results table
 
         :param session: Draytekwebadmin session object
-        :param status: Status from perfoming write operations
+        :param status: Status from performing write operations
         :param firmware: Draytekwebadmin firmware object
         :param router_name: (optional): Router name from source CSV file, for if connection fails
         :return: row list of fields
@@ -295,6 +321,41 @@ class results_table:
         print(tabulate(self._table, headers=self.headers, showindex=True))
 
 
+class TestSettings:
+    """Test Environment Settings"""
+
+    def __init__(
+        self,
+        upgrade=None,
+        config_dir=None,
+        browser=None,
+        headless=None,
+        search_driver=None,
+        implicit_wait_time=None,
+        explicit_wait_time=None,
+        debug=False,
+    ):
+        """"Test Environment settings.
+
+        :param upgrade: Flag to upgrade should not be attempted or just previewed
+        :param config_dir: Path to toolium configuration file
+        :param browser: browser name to override configuration file
+        :param headless: headless session, to override configuration file
+        :param search_driver: search local directories for browser driver executables
+        :param implicit_wait_time: WebDriver implicit wait time, override configuration file
+        :param explicit_wait_time: WebDriver explicit wait time, override configuration file
+        :param debug: flag to trigger debug behaviours
+        """
+        self.upgrade = upgrade
+        self.config_dir = config_dir
+        self.browser = browser
+        self.headless = headless
+        self.search_driver = search_driver
+        self.implicit_wait_time = implicit_wait_time
+        self.explicit_wait_time = explicit_wait_time
+        self.debug = debug
+
+
 def main():
     """Main. Called when program called directly from the command line.
     """
@@ -320,13 +381,20 @@ def main():
         if args.template:
             create_template_csv(args.template)
         elif args.inputfile:
+            test_settings = TestSettings(
+                upgrade=args.upgrade,
+                config_dir=args.config,
+                browser=args.browser,
+                headless=args.headless,
+                search_driver=args.search_driver,
+                implicit_wait_time=args.implicit_wait,
+                explicit_wait_time=args.explicit_wait,
+                debug=args.debug,
+            )
             datasource = read_csv(args.inputfile)
             for router in datasource:
                 (session, firmware, status, upgrade_required) = upgrade_router(
-                    router=router,
-                    upgrade=args.upgrade,
-                    config_dir=args.config,
-                    debug=args.debug,
+                    router=router, test_settings=test_settings
                 )
                 if upgrade_required:
                     upgrade_pending_count += 1

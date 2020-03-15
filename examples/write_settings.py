@@ -5,6 +5,7 @@ import csv
 import logging
 import time
 from urllib.parse import urlparse
+from pathlib import Path
 
 from tabulate import tabulate
 
@@ -67,13 +68,50 @@ def _get_parser():
         help="Do not reboot routers after configuration change, even if required",
     )
     parser.add_argument(
-        "-d",
+        "-c",
+        "--config",
+        type=dir_path,
+        help=r"Location of configuration file directory e.g. -c c:\draytekwebadmin\conf",
+    )
+    parser.add_argument(
+        "--browser",
+        type=str,
+        help="Browser name [chrome|firefox] overrides configuration file",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run session headless (without GUI). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--search_driver",
+        action="store_true",
+        help="Searches for browser driver in current directory, under conf or driver. Overrides configuration file",
+    )
+    parser.add_argument(
+        "--implicit_wait",
+        type=int,
+        help="WebDriver implicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--explicit_wait",
+        type=int,
+        help="WebDriver explicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         default=False,
         help="Errors will attempt to capture Web page",
     )
     return parser
+
+
+def dir_path(string):
+    if Path.exists(Path(string)):
+        return string
+    else:
+        raise NotADirectoryError(string)
 
 
 def parse_address_url_to_host(address):
@@ -138,13 +176,12 @@ def diff(current, new):
     return differences
 
 
-def configure_router(router, allow_reboot, whatif=False, debug=False):
+def configure_router(router, allow_reboot, test_settings):
     """ Apply router configuration specified
 
     :param router: row from CSV with settings for a single router
     :param allow_reboot: reboot router if required after config change
-    :param whatif: Compares settings does not write changes to router
-    :param debug: write a debug files of the page source on exception
+    :param test_settings: collection of test settings
     :return: webadmin_session
     :return: Configuration status message
     """
@@ -156,6 +193,12 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
         settings = extract_settings(router)
 
         webadmin_session = settings["connection"]
+        webadmin_session.config_dir = test_settings.config_dir
+        webadmin_session.browser = test_settings.browser
+        webadmin_session.headless = test_settings.headless
+        webadmin_session.search_driver = test_settings.search_driver
+        webadmin_session.implicit_wait_time = test_settings.implicit_wait_time
+        webadmin_session.explcit_wait_time = test_settings.explicit_wait_time
         # Not strictly needed, since configuring modules will trigger connect.
         # But this way we can ensure we ensure we can connect outside the for loop.
         webadmin_session.start_session()
@@ -169,7 +212,7 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
                 current = webadmin_session.read_settings(type(settings[modulename]))
                 differences = diff(current, newsettings)
                 if len(differences) > 0:
-                    if whatif:
+                    if test_settings.what_if:
                         for change in differences:
                             router_configure_status = (
                                 "WhatIf Mode - Changes not applied"
@@ -203,7 +246,7 @@ def configure_router(router, allow_reboot, whatif=False, debug=False):
     except Exception as exception:
         LOGGER.critical(exception)
         if webadmin_session is not None:
-            if debug:
+            if test_settings.debug:
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 # Collect the information from the session object and close it before attempting file access in case that fails
                 # This avoids having another try/except/finally block within this error handling routine.
@@ -360,7 +403,7 @@ def create_template_csv(output_file):
 def result_row_builder(session, status, router_name=None):
     """Generate data for results table
         :param session: Draytekwebadmin session object
-        :param status: Status from perfoming write operations
+        :param status: Status from performing write operations
         :param router_name: (optional): Router name from source CSV file, for if connection fails
         :return: row list of fields
     """
@@ -414,6 +457,41 @@ class results_table:
         print(tabulate(self._table, headers=self.headers, showindex=True))
 
 
+class TestSettings:
+    """Test Environment Settings"""
+
+    def __init__(
+        self,
+        what_if=None,
+        config_dir=None,
+        browser=None,
+        headless=None,
+        search_driver=None,
+        implicit_wait_time=None,
+        explicit_wait_time=None,
+        debug=False,
+    ):
+        """"Test Environment settings.
+
+        :param what_if: Flag to indicate settings should not be applied, changes shown
+        :param config_dir: Path to toolium configuration file
+        :param browser: browser name to override configuration file
+        :param headless: headless session, to override configuration file
+        :param search_driver: search local directories for browser driver executables
+        :param implicit_wait_time: WebDriver implicit wait time, override configuration file
+        :param explicit_wait_time: WebDriver explicit wait time, override configuration file
+        :param debug: flag to trigger debug behaviours
+        """
+        self.what_if = what_if
+        self.config_dir = config_dir
+        self.browser = browser
+        self.headless = headless
+        self.search_driver = search_driver
+        self.implicit_wait_time = implicit_wait_time
+        self.explicit_wait_time = explicit_wait_time
+        self.debug = debug
+
+
 def main():
     """Main. Called when program called directly from the command line.
 
@@ -427,6 +505,16 @@ def main():
         create_template_csv(args.template)
     elif args.inputfile:
         try:
+            test_settings = TestSettings(
+                what_if=args.whatif,
+                config_dir=args.config,
+                browser=args.browser,
+                headless=args.headless,
+                search_driver=args.search_driver,
+                implicit_wait_time=args.implicit_wait,
+                explicit_wait_time=args.explicit_wait,
+                debug=args.debug,
+            )
             datasource = read_csv(args.inputfile)
 
             # For each row attempt to configure router
@@ -434,8 +522,7 @@ def main():
                 (session, status) = configure_router(
                     router=router,
                     allow_reboot=args.reboot,
-                    whatif=args.whatif,
-                    debug=args.debug,
+                    test_settings=test_settings,
                 )
                 results.add_row(result_row_builder(session, status))
                 results.print()

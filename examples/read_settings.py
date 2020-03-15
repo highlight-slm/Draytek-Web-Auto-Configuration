@@ -5,6 +5,7 @@ import csv
 import logging
 import time
 from urllib.parse import urlparse
+from pathlib import Path
 
 from draytekwebadmin import (
     DrayTekWebAdmin,
@@ -67,13 +68,50 @@ def _get_parser():
         help="Output data file (default: draytek-out.csv)",
     )
     parser.add_argument(
-        "-d",
+        "-c",
+        "--config",
+        type=dir_path,
+        help=r"Location of configuration file directory e.g. -c c:\draytekwebadmin\conf",
+    )
+    parser.add_argument(
+        "--browser",
+        type=str,
+        help="Browser name [chrome|firefox] overrides configuration file",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run session headless (without GUI). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--search_driver",
+        action="store_true",
+        help="Searches for browser driver in current directory, under conf or driver. Overrides configuration file",
+    )
+    parser.add_argument(
+        "--implicit_wait",
+        type=int,
+        help="WebDriver implicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
+        "--explicit_wait",
+        type=int,
+        help="WebDriver explicit wait time (secs). Overrides configuration file",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         default=False,
         help="Errors will attempt to capture Web page",
     )
     return parser
+
+
+def dir_path(string):
+    if Path.exists(Path(string)):
+        return string
+    else:
+        raise NotADirectoryError(string)
 
 
 def parse_address_url_to_host(address):
@@ -199,6 +237,35 @@ def save_to_csv(data, filename):
         csvfile.writerow(data)
 
 
+class TestSettings:
+    """Test Environment Settings"""
+
+    def __init__(
+        self,
+        config_dir=None,
+        browser=None,
+        headless=None,
+        search_driver=None,
+        implicit_wait_time=None,
+        explicit_wait_time=None,
+    ):
+        """"Test Environment settings.
+
+        :param config_dir: Path to toolium configuration file
+        :param browser: browser name to override configuration file
+        :param headless: headless session, to override configuration file
+        :param search_driver: search local directories for browser driver executables
+        :param implicit_wait_time: WebDriver implicit wait time, override configuration file
+        :param explicit_wait_time: WebDriver explicit wait time, override configuration file
+        """
+        self.config_dir = config_dir
+        self.browser = browser
+        self.headless = headless
+        self.search_driver = search_driver
+        self.implicit_wait_time = implicit_wait_time
+        self.explicit_wait_time = explicit_wait_time
+
+
 def main():
     """Main. Called when program called directly from the command line.
 
@@ -207,6 +274,14 @@ def main():
     parser = _get_parser()
     args = parser.parse_args(argv)
     host, port, https = parse_address_url_to_host(args.address)
+    test_settings = TestSettings(
+        config_dir=args.config,
+        browser=args.browser,
+        headless=args.headless,
+        search_driver=args.search_driver,
+        implicit_wait_time=args.implicit_wait,
+        explicit_wait_time=args.explicit_wait,
+    )
     webadmin_session = None
     try:
         webadmin_session = DrayTekWebAdmin(
@@ -215,6 +290,12 @@ def main():
             use_https=https,
             username=args.user,
             password=args.password,
+            config_dir=test_settings.config_dir,
+            browser=test_settings.browser,
+            headless=test_settings.headless,
+            search_driver=test_settings.search_driver,
+            implict_wait_time=test_settings.implicit_wait_time,
+            explcit_wait_time=test_settings.explicit_wait_time,
         )
         webadmin_session.start_session()
         dataset = read_data(webadmin_session)

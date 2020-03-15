@@ -30,7 +30,7 @@ The following devices and firmware versions have been tested. It is likely that 
 
 ## Requirements
 
-This utility uses Python with Selenium Web Driver (using [toolium](https://github.com/Telefonica/toolium) as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
+This utility uses Python with Selenium Web Driver (using [Toolium](https://github.com/Telefonica/toolium) as a wrapper) in order to interact with the DrayTek Web Management console. To run this utility you will need to install:
 
 - [Python 3.6 (or later)](https://www.python.org/downloads/)
 - Install driver for required web browser. The path to the driver needs to be defined in `conf\properties.cfg`.
@@ -51,7 +51,7 @@ This example reads the configuration of router and outputs the settings to a CSV
 The supported command line arguments can be displayed by running: `python read_settings.py -h`
 
 ```text
-usage: read_settings.py [-h] -a ADDRESS [-u USER] -p PASSWORD [-o OUTPUT] [-d]
+usage: read_settings.py [-h] -a ADDRESS [-u USER] -p PASSWORD [-o OUTPUT] [-c CONFIG] [--browser BROWSER] [--headless] [--search_driver] [--implicit_wait IMPLICIT_WAIT] [--explicit_wait EXPLICIT_WAIT] [--debug]
 
 Read DrayTek router settings. Saving the result to a CSV file.
 
@@ -64,7 +64,16 @@ optional arguments:
                         Router administrator password
   -o OUTPUT, --output OUTPUT
                         Output data file (default: draytek-out.csv)
-  -d, --debug           Errors will attempt to capture Web page
+  -c CONFIG, --config CONFIG
+                        Location of configuration file directory e.g. -c c:\draytekwebadmin\conf
+  --browser BROWSER     Browser name [chrome|firefox] overrides configuration file
+  --headless            Run session headless (without GUI). Overrides configuration file
+  --search_driver       Searches for browser driver in current directory, under conf or driver. Overrides configuration file
+  --implicit_wait IMPLICIT_WAIT
+                        WebDriver implicit wait time (secs). Overrides configuration file
+  --explicit_wait EXPLICIT_WAIT
+                        WebDriver explicit wait time (secs). Overrides configuration file
+  --debug               Errors will attempt to capture Web page
 ```
 
 ### Write Router Settings
@@ -75,7 +84,7 @@ The support command line arguments can be displayed by running: `python write_se
 Using the -t option a template CSV file will be generated.
 
 ```text
-usage: write_settings.py [-h] [-t TEMPLATE] [-w] [--no-reboot] [-d] [inputfile]
+usage: write_settings.py [-h] [-t TEMPLATE] [-w] [--no-reboot] [-c CONFIG] [--browser BROWSER] [--headless] [--search_driver] [--implicit_wait IMPLICIT_WAIT] [--explicit_wait EXPLICIT_WAIT] [--debug] [inputfile]
 
 Write DrayTek router settings from a source CSV file.
 
@@ -86,10 +95,18 @@ optional arguments:
   -h, --help            show this help message and exit
   -t TEMPLATE, --template TEMPLATE
                         Generate blank template CSV e.g. -t template.csv
-  -w, --whatif          Show what changes would be made, does not make any
-                        change to current configuration
+  -w, --whatif          Show what changes would be made, does not make any change to current configuration
   --no-reboot           Do not reboot routers after configuration change, even if required
-  -d, --debug           Errors will attempt to capture Web page
+  -c CONFIG, --config CONFIG
+                        Location of configuration file directory e.g. -c c:\draytekwebadmin\conf
+  --browser BROWSER     Browser name [chrome|firefox] overrides configuration file
+  --headless            Run session headless (without GUI). Overrides configuration file
+  --search_driver       Searches for browser driver in current directory, under conf or driver. Overrides configuration file
+  --implicit_wait IMPLICIT_WAIT
+                        WebDriver implicit wait time (secs). Overrides configuration file
+  --explicit_wait EXPLICIT_WAIT
+                        WebDriver explicit wait time (secs). Overrides configuration file
+  --debug               Errors will attempt to capture Web page
 ```
 
 ### Upgrade Router Firmware
@@ -104,7 +121,7 @@ Usage:
   - Example [upgrade.csv](https://raw.githubusercontent.com/highlight-slm/Draytek-Web-Auto-Configuration/master/examples/upgrade.csv)
 
 ```text
-usage: upgrade.py [-h] [-t TEMPLATE] [-u] [-d] [-c CONFIG] [inputfile]
+usage: upgrade.py [-h] [-t TEMPLATE] [-u] [-c CONFIG] [--browser BROWSER] [--headless] [--search_driver] [--implicit_wait IMPLICIT_WAIT] [--explicit_wait EXPLICIT_WAIT] [--debug] [inputfile]
 
 Upgrade Draytek Router firmware from a source CSV file
 
@@ -116,9 +133,16 @@ optional arguments:
   -t TEMPLATE, --template TEMPLATE
                         Generate blank template CSV e.g. -t template.csv
   -u, --upgrade         Perform firmware upgrade (inc reboot), preview only
-  -d, --debug           Errors will attempt to capture Web page
   -c CONFIG, --config CONFIG
-                        Location of configuration file directory e.g. -c c:\upgrade\conf
+                        Location of configuration file directory e.g. -c c:\draytekwebadmin\conf
+  --browser BROWSER     Browser name [chrome|firefox] overrides configuration file
+  --headless            Run session headless (without GUI). Overrides configuration file
+  --search_driver       Searches for browser driver in current directory, under conf or driver. Overrides configuration file
+  --implicit_wait IMPLICIT_WAIT
+                        WebDriver implicit wait time (secs). Overrides configuration file
+  --explicit_wait EXPLICIT_WAIT
+                        WebDriver explicit wait time (secs). Overrides configuration file
+  --debug               Errors will attempt to capture Web page
 ```
 
 ## Development & Unit Testing
