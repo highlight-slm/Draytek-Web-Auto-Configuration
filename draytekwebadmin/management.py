@@ -21,7 +21,7 @@ class Management:
         self.enable_validation_code = enable_validation_code
 
     def __setattr__(self, name, value):
-        if name in ["disable_auto_logout", "enable_validation_code"]:
+        if name in ("disable_auto_logout", "enable_validation_code"):
             value = bool_or_none(value)
         super(Management, self).__setattr__(name, value)
 
@@ -222,6 +222,64 @@ class DeviceManagement:
     def __setattr__(self, name, value):
         value = bool_or_none(value)
         super(DeviceManagement, self).__setattr__(name, value)
+
+
+class IPv6Management:
+    """IPv6Management object."""
+
+    def __init__(
+        self,
+        internet_management=None,
+        telnet_server=None,
+        http_server=None,
+        https_server=None,
+        ssh_server=None,
+        snmp_server=None,
+        disable_ping_from_internet=None,
+        access_index_1=None,
+        access_index_2=None,
+        access_index_3=None,
+        access_index_4=None,
+        access_index_5=None,
+        access_index_6=None,
+        access_index_7=None,
+        access_index_8=None,
+        access_index_9=None,
+        access_index_10=None,
+    ):
+        """Create a new IPv6Management object."""
+        self.internet_management = internet_management
+        self.telnet_server = telnet_server
+        self.http_server = http_server
+        self.https_server = https_server
+        self.ssh_server = ssh_server
+        self.snmp_server = snmp_server
+        self.disable_ping_from_internet = disable_ping_from_internet
+        self.access_index_1 = access_index_1
+        self.access_index_2 = access_index_2
+        self.access_index_3 = access_index_3
+        self.access_index_4 = access_index_4
+        self.access_index_5 = access_index_5
+        self.access_index_6 = access_index_6
+        self.access_index_7 = access_index_7
+        self.access_index_8 = access_index_8
+        self.access_index_9 = access_index_9
+        self.access_index_10 = access_index_10
+
+    def __setattr__(self, name, value):
+        if name in (
+            "internet_management",
+            "telnet_server",
+            "http_server",
+            "https_server",
+            "ssh_server",
+            "snmp_server",
+            "disable_ping_from_internet",
+        ):
+            value = bool_or_none(value)
+        else:
+            value = int_or_none(value)
+        super(IPv6Management, self).__setattr__(name, value)
 
 
 class LAN_Access:

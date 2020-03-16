@@ -239,6 +239,10 @@ class DrayTekWebAdmin:
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).read_device_management_settings()
+        if name == "IPv6Management":
+            return ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).read_ipv6_management_settings()
         if name == "LAN_Access":
             return ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
@@ -313,6 +317,10 @@ class DrayTekWebAdmin:
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper
             ).write_device_management_settings(settings)
+        elif name == "IPv6Management":
+            reboot_req = ManagementPage(
+                driver_wrapper=self.session.driver_wrapper
+            ).write_ipv6_management_settings(settings)
         elif name == "LAN_Access":
             reboot_req = ManagementPage(
                 driver_wrapper=self.session.driver_wrapper

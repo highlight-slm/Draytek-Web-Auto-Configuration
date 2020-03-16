@@ -12,6 +12,7 @@ from draytekwebadmin.management import (
     Management,
     ManagementPort,
     Encryption,
+    IPv6Management,
     LAN_Access,
 )
 from draytekwebadmin.pages.menu_navigator import MenuNavigator
@@ -22,11 +23,12 @@ class ManagementPage(BasePageObject):
     """Selenium Page Object Model: ManagementPage."""
 
     # Page Elements
-    management_setup_tab = Link(By.ID, "tab1")
+    ipv4_management_setup_tab = Link(By.ID, "tab1")
+    ipv6_management_setup_tab = Link(By.ID, "tab2")
     lan_access_setup_tab = Link(By.ID, "tab3")
     ok_button = Button(By.CLASS_NAME, "btnw")
 
-    # TAB: Management Setup
+    # TAB: IPv4 Management Setup
     router_name = InputText(By.NAME, "sRouterName")
     disable_auto_logout = Checkbox(By.NAME, "sDeflogoff")
     enable_validation_code = Checkbox(By.NAME, "sValidatedCode")
@@ -101,6 +103,26 @@ class ManagementPage(BasePageObject):
     device_management = Checkbox(By.NAME, "chkDevMng")
     device_management_respond_external = Checkbox(By.NAME, "NoRsp2ExDev")
 
+    # TAB: IPv6 Management Setup
+    ipv6_enable_internet_access = Checkbox(By.NAME, "sIp6RMC")
+    ipv6_http = Checkbox(By.NAME, "sIp6Http")
+    ipv6_https = Checkbox(By.NAME, "sIp6Https")
+    ipv6_telnet = Checkbox(By.NAME, "sIp6Telnt")
+    ipv6_ssh = Checkbox(By.NAME, "sIp6Ssh")
+    ipv6_snmp = Checkbox(By.NAME, "sIp6Snmp")
+    ipv6_disable_ping_from_internet = Checkbox(By.NAME, "sIp6Ping")
+
+    ipv6_access_list_index_1 = InputText(By.NAME, "v6index1")
+    ipv6_access_list_index_2 = InputText(By.NAME, "v6index2")
+    ipv6_access_list_index_3 = InputText(By.NAME, "v6index3")
+    ipv6_access_list_index_4 = InputText(By.NAME, "v6index4")
+    ipv6_access_list_index_5 = InputText(By.NAME, "v6index5")
+    ipv6_access_list_index_6 = InputText(By.NAME, "v6index6")
+    ipv6_access_list_index_7 = InputText(By.NAME, "v6index7")
+    ipv6_access_list_index_8 = InputText(By.NAME, "v6index8")
+    ipv6_access_list_index_9 = InputText(By.NAME, "v6index9")
+    ipv6_access_list_index_10 = InputText(By.NAME, "v6index10")
+
     # TAB: LAN Access Setup
     allow_management_from_lan = Checkbox(By.NAME, "sMngtfrmLanEn1")
     lan_ftp = Checkbox(By.NAME, "iMngtlanftp1")
@@ -151,7 +173,7 @@ class ManagementPage(BasePageObject):
         :returns: Management object
 
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return Management(
             router_name=self.read_element_value(self.router_name),
             disable_auto_logout=self.read_element_value(self.disable_auto_logout),
@@ -163,7 +185,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: Management object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.router_name, settings.router_name)
         self.set_element_value(self.disable_auto_logout, settings.disable_auto_logout)
         self.set_element_value(
@@ -177,7 +199,7 @@ class ManagementPage(BasePageObject):
 
         :returns: InternetAccessControl object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return InternetAccessControl(
             internet_management=self.read_element_value(self.enable_internet_access),
             domain_name_allowed=self.read_element_value(self.domain_name_allowed),
@@ -199,7 +221,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: InternetAccessControl object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(
             self.enable_internet_access, settings.internet_management
         )
@@ -223,7 +245,7 @@ class ManagementPage(BasePageObject):
 
         :returns: AccessList object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return AccessList(
             list_1_ip_object_index=self.read_element_value(self.access_index_1),
             list_2_ip_object_index=self.read_element_value(self.access_index_2),
@@ -242,7 +264,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: AccessList object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.access_index_1, settings.list_1_ip_object_index)
         self.set_element_value(self.access_index_2, settings.list_2_ip_object_index)
         self.set_element_value(self.access_index_3, settings.list_3_ip_object_index)
@@ -261,7 +283,7 @@ class ManagementPage(BasePageObject):
 
         :returns: ManagementPort object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return ManagementPort(
             user_defined_ports=self.read_element_value(self.user_defined_ports_radio),
             telnet_port=self.read_element_value(self.telnet_port),
@@ -277,7 +299,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: ManagementPort object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         if settings.user_defined_ports:
             self.set_element_value(
                 self.user_defined_ports_radio, settings.user_defined_ports
@@ -298,7 +320,7 @@ class ManagementPage(BasePageObject):
 
         :returns: BruteForceProtection object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return BruteForceProtection(
             enable=self.read_element_value(self.bf_enable),
             ftp_server=self.read_element_value(self.bf_ftp),
@@ -316,7 +338,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: BruteForceProtection object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.bf_enable, settings.enable)
         self.set_element_value(self.bf_ftp, settings.ftp_server)
         self.set_element_value(self.bf_http, settings.http_server)
@@ -334,7 +356,7 @@ class ManagementPage(BasePageObject):
 
         :returns: Encryption object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return Encryption(
             tls_1_2=self.read_element_value(self.enc_tls12),
             tls_1_1=self.read_element_value(self.enc_tls11),
@@ -347,7 +369,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: Encryption object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.enc_tls12, settings.tls_1_2)
         self.set_element_value(self.enc_tls11, settings.tls_1_1)
         self.set_element_value(self.enc_tls10, settings.tls_1_0)
@@ -360,7 +382,7 @@ class ManagementPage(BasePageObject):
 
         :returns: CVM_AccessControl object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return CVM_AccessControl(
             enable=self.read_element_value(self.cvm_port_enable),
             ssl_enable=self.read_element_value(self.cvm_ssl_port_enable),
@@ -373,7 +395,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: CVM_AccessControl object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.cvm_port_enable, settings.enable)
         self.set_element_value(self.cvm_ssl_port_enable, settings.ssl_enable)
         self.set_element_value(self.cvm_port, settings.port)
@@ -386,7 +408,7 @@ class ManagementPage(BasePageObject):
 
         :returns: AP_Management object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return AP_Management(enable=self.read_element_value(self.ap_management),)
 
     def write_ap_management_settings(self, settings: AP_Management):
@@ -394,7 +416,7 @@ class ManagementPage(BasePageObject):
 
         :param settings: AP_Management object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.ap_management, settings.enable)
         self.ok_button.click()
         return self.check_reboot()
@@ -404,7 +426,7 @@ class ManagementPage(BasePageObject):
 
         :returns: DeviceManagement object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         return DeviceManagement(
             enable=self.read_element_value(self.device_management),
             respond_to_external_device=self.read_element_value(
@@ -417,11 +439,72 @@ class ManagementPage(BasePageObject):
 
         :param settings: DeviceManagement object
         """
-        self.open_page(tab=self.management_setup_tab)
+        self.open_page(tab=self.ipv4_management_setup_tab)
         self.set_element_value(self.device_management, settings.enable)
         self.set_element_value(
             self.device_management_respond_external, settings.respond_to_external_device
         )
+        self.ok_button.click()
+        return self.check_reboot()
+
+    def read_ipv6_management_settings(self):
+        """Return the currrent IPv6 Management settings.
+
+        :returns IPv6Management object
+        """
+        self.open_page(tab=self.ipv6_management_setup_tab)
+        return IPv6Management(
+            internet_management=self.read_element_value(
+                self.ipv6_enable_internet_access
+            ),
+            telnet_server=self.read_element_value(self.ipv6_telnet),
+            http_server=self.read_element_value(self.ipv6_http),
+            https_server=self.read_element_value(self.ipv6_https),
+            ssh_server=self.read_element_value(self.ipv6_ssh),
+            snmp_server=self.read_element_value(self.ipv6_snmp),
+            disable_ping_from_internet=self.read_element_value(
+                self.ipv6_disable_ping_from_internet
+            ),
+            access_index_1=self.read_element_value(self.ipv6_access_list_index_1),
+            access_index_2=self.read_element_value(self.ipv6_access_list_index_2),
+            access_index_3=self.read_element_value(self.ipv6_access_list_index_3),
+            access_index_4=self.read_element_value(self.ipv6_access_list_index_4),
+            access_index_5=self.read_element_value(self.ipv6_access_list_index_5),
+            access_index_6=self.read_element_value(self.ipv6_access_list_index_6),
+            access_index_7=self.read_element_value(self.ipv6_access_list_index_7),
+            access_index_8=self.read_element_value(self.ipv6_access_list_index_8),
+            access_index_9=self.read_element_value(self.ipv6_access_list_index_9),
+            access_index_10=self.read_element_value(self.ipv6_access_list_index_10),
+        )
+
+    def write_ipv6_management_settings(self, settings: IPv6Management):
+        """Populate the IPv6Management setting.
+
+        :param settings: IPv6Management object
+        """
+        self.open_page(tab=self.ipv6_management_setup_tab)
+        self.set_element_value(
+            self.ipv6_enable_internet_access, settings.internet_management
+        )
+        self.set_element_value(self.ipv6_telnet, settings.telnet_server)
+        self.set_element_value(self.ipv6_http, settings.http_server)
+        self.set_element_value(self.ipv6_https, settings.https_server)
+        self.set_element_value(self.ipv6_ssh, settings.ssh_server)
+        self.set_element_value(self.ipv6_snmp, settings.snmp_server)
+        self.set_element_value(
+            self.ipv6_disable_ping_from_internet, settings.disable_ping_from_internet
+        )
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_1)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_2)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_3)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_4)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_5)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_6)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_7)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_8)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_9)
+        self.set_element_value(self.ipv6_access_list_index_1, settings.access_index_10)
+
         self.ok_button.click()
         return self.check_reboot()
 

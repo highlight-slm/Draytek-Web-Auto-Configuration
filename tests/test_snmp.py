@@ -44,11 +44,13 @@ class TestSNMPv3(unittest.TestCase):
         self.assertEqual("No Auth", SNMPv3(auth_algorithm="No Auth").auth_algorithm)
         self.assertEqual("MD5", SNMPv3(auth_algorithm="MD5").auth_algorithm)
         self.assertEqual("SHA", SNMPv3(auth_algorithm="SHA").auth_algorithm)
+        self.assertIsNone(SNMPv3(auth_algorithm="").auth_algorithm)
         self.assertEqual("secret", SNMPv3(auth_password="secret").auth_password)
         self.assertIsNone(SNMPv3(auth_password="********").auth_password)
         self.assertEqual("No Priv", SNMPv3(priv_algorithm="No Priv").priv_algorithm)
         self.assertEqual("DES", SNMPv3(priv_algorithm="DES").priv_algorithm)
         self.assertEqual("AES", SNMPv3(priv_algorithm="AES").priv_algorithm)
+        self.assertIsNone(SNMPv3(priv_algorithm="").priv_algorithm)
         self.assertEqual(
             "another secret", SNMPv3(priv_password="another secret").priv_password
         )

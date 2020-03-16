@@ -73,13 +73,19 @@ class SNMPv3(SNMP):
                     # Don't store. If all the same character. Likely all * as password field
                     value = None
         if name == "auth_algorithm":
-            if value is not None and value not in SNMPV3_AUTH_ALGO:
-                raise ValueError(
-                    f"Unsupported SNMPv3 Authentication Algorithm: {value}"
-                )
+            if (value is not None) and (value not in SNMPV3_AUTH_ALGO):
+                if len(value) == 0:
+                    value = None
+                else:
+                    raise ValueError(
+                        f"Unsupported SNMPv3 Authentication Algorithm: {value}"
+                    )
         if name == "priv_algorithm":
-            if value is not None and value not in SNMPV3_PRIV_ALGP:
-                raise ValueError(f"Unsupported SNMPv3 Privacy Algorithm: {value}")
+            if (value is not None) and (value not in SNMPV3_PRIV_ALGP):
+                if len(value) == 0:
+                    value = None
+                else:
+                    raise ValueError(f"Unsupported SNMPv3 Privacy Algorithm: {value}")
         super(SNMPv3, self).__setattr__(name, value)
 
 

@@ -25,6 +25,7 @@ from draytekwebadmin import (
     DeviceManagement,
     AP_Management,
     LAN_Access,
+    IPv6Management,
 )
 
 LOGGER = logging.getLogger("root")
@@ -285,6 +286,7 @@ def extract_settings(router_settings, separator="|"):
     device_management = DeviceManagement()
     ap_management = AP_Management()
     lan_access = LAN_Access()
+    ipv6_management = IPv6Management()
     invalid = False
     try:
         for key in router_settings.keys():
@@ -367,6 +369,11 @@ def extract_settings(router_settings, separator="|"):
                     setattr(lan_access, fieldname, router_settings.get(key))
                 else:
                     invalid = True
+            elif modulename == type(ipv6_management).__name__.lower():
+                if hasattr(ipv6_management, fieldname):
+                    setattr(ipv6_management, fieldname, router_settings.get(key))
+                else:
+                    invalid = True
             if invalid:
                 LOGGER.error(f"Ignoring unexpected field: {modulename}|{fieldname}")
                 invalid = False
@@ -389,6 +396,7 @@ def extract_settings(router_settings, separator="|"):
     settings["device_management"] = device_management
     settings["ap_management"] = ap_management
     settings["lan_access"] = lan_access
+    settings["ipv6_managament"] = ipv6_management
     return settings
 
 

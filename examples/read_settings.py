@@ -23,6 +23,7 @@ from draytekwebadmin import (
     DeviceManagement,
     AP_Management,
     LAN_Access,
+    IPv6Management,
 )
 
 LOGGER = logging.getLogger("root")
@@ -167,6 +168,7 @@ def read_data(session):
     device_management = vars(session.read_settings(DeviceManagement))
     ap_management = vars(session.read_settings(AP_Management))
     lan_access = vars(session.read_settings(LAN_Access))
+    ipv6_management = vars(session.read_settings(IPv6Management))
 
     # Rename the dictionary keys to include the object model name
     sep = "|"
@@ -186,6 +188,7 @@ def read_data(session):
     device_management = prefixKeys(device_management, DeviceManagement.__name__, sep)
     ap_management = prefixKeys(ap_management, AP_Management.__name__, sep)
     lan_access = prefixKeys(lan_access, LAN_Access.__name__, sep)
+    ipv6_management = prefixKeys(ipv6_management, IPv6Management.__name__, sep)
 
     # Merge the data sources into a single dictionary
     data = {
@@ -205,6 +208,7 @@ def read_data(session):
         **device_management,
         **ap_management,
         **lan_access,
+        **ipv6_management,
     }
     return data
 
@@ -294,8 +298,8 @@ def main():
             browser=test_settings.browser,
             headless=test_settings.headless,
             search_driver=test_settings.search_driver,
-            implict_wait_time=test_settings.implicit_wait_time,
-            explcit_wait_time=test_settings.explicit_wait_time,
+            implicit_wait_time=test_settings.implicit_wait_time,
+            explicit_wait_time=test_settings.explicit_wait_time,
         )
         webadmin_session.start_session()
         dataset = read_data(webadmin_session)
